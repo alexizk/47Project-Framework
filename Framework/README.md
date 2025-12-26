@@ -1,9 +1,15 @@
-# Framework
+# Framework (Entry)
 
-`47Project.Framework.ps1` is the minimal CLI Nexus shell.
+Entry script:
+- `Framework/47Project.Framework.ps1`
 
-Core utilities live in `Core/47.Core.psm1`.
+Usage:
+```powershell
+pwsh -NoLogo -NoProfile -File .\Framework\47Project.Framework.ps1
+pwsh -NoLogo -NoProfile -File .\Framework\47Project.Framework.ps1 -Help
+pwsh -NoLogo -NoProfile -File .\Framework\47Project.Framework.ps1 -Menu -Json
+```
 
-
-## CLI shim
-Run `pwsh -File ..\47.ps1 help` or `..\47.ps1 doctor` from the pack root.
+See:
+- `../README.md`
+- `../docs/QuickStart.md`
