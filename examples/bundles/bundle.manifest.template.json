@@ -1,0 +1,15 @@
+{
+  "kind": "47bundle",
+  "version": "1.0",
+  "created": "2025-12-26T06:08:23Z",
+  "files": [
+    {
+      "path": "README.md",
+      "sha256": "<sha256hex>"
+    },
+    {
+      "path": "modules/appcrawler/module.json",
+      "sha256": "<sha256hex>"
+    }
+  ]
+}

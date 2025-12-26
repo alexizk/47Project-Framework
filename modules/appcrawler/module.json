@@ -1,0 +1,28 @@
+{
+  "id": "appcrawler",
+  "name": "AppCrawler Bridge",
+  "version": "0.1.0",
+  "description": "Bridge module for launching Project47 AppCrawler and grabbing best-effort inventory.",
+  "actions": [
+    {
+      "id": "launch",
+      "type": "powershellFunction",
+      "name": "P47-AppCrawler-Launch",
+      "label": "Launch AppCrawler"
+    },
+    {
+      "id": "inventory.snapshot",
+      "type": "powershellFunction",
+      "name": "P47-AppCrawler-GetInventoryBestEffort",
+      "label": "Inventory Snapshot (best-effort)"
+    }
+  ],
+  "settings": [
+    {
+      "key": "modules.appcrawler.path",
+      "type": "string",
+      "default": "",
+      "label": "AppCrawler Script Path"
+    }
+  ]
+}

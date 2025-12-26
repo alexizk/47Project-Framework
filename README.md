@@ -1,60 +1,19 @@
-# 47Project Framework — Ultimate Pack (v2)
+# 47Project Framework — Ultimate Pack
 
-This pack is a **single-zip, offline-friendly** starter kit for the 47Project Framework ecosystem:
+This zip contains the *single-source* reference docs and starter artifacts for the 47Project Framework (Nexus shell), including:
+- Master Plan A–Z
+- Module Manifest Schema (embedded in examples)
+- Settings UI Binding Spec v1
+- Plan Canonicalization & Hashing Spec v1
+- Offline `.47bundle` spec
+- Capability Catalog v1
+- Example module manifests (AppSCrawler, IdentityKit, HelloModule)
+- Example plan
+- Your current AppCrawler PowerShell scripts (as provided in the project)
 
-- A minimal **Framework / Nexus Shell** launcher (CLI)
-- A **module system** (manifests + entrypoints)
-- Enforceable **JSON Schemas**
-- A tooling chain for **validation, canonicalization, hashing, signing, bundles**
-- Examples (plans, policies, catalogs, profiles)
-- Tests (Pester)
-
-## Quick start
-
-### 1) Validate the pack
-```powershell
-pwsh .\tools\Build-All.ps1
-```
-
-### 2) Run Nexus Shell (CLI)
-```powershell
-pwsh .\Framework\47Project.Framework.ps1
-```
-
-### 3) Build & verify an offline bundle
-```powershell
-pwsh .\tools\Build-47Bundle.ps1  -PlanPath .\examples\plans\sample_install.plan.json -PayloadDir .\examples\bundles\sample_payload -OutBundlePath .\examples\bundles\sample.47bundle
-pwsh .\tools\Verify-47Bundle.ps1 -BundlePath .\examples\bundles\sample.47bundle
-```
-
-## Layout
-
-- `Framework/` – framework launcher + `Core/`
-- `modules/` – module manifests + module entrypoints
-- `schemas/` – JSON Schemas (contracts)
-- `tools/` – CLI tools (validate/sign/bundle/support)
-- `examples/` – plans/policies/catalogs/profiles/payload
-- `tests/` – Pester tests
-- `docs/` – specs + design docs
+## Suggested next step
+Use these docs as the locked contract before coding the final version.
 
 ## Notes
-
-- The framework is **safe-by-default**: unsafe behaviors are gated via policy (`examples/policies/unsafe_all.policy.json` shows how to enable power-user mode).
-- `Project47_AppCrawler_base.ps1` is the primary AppS Crawler engine. `Project47_AppCrawler.ps1` is a thin wrapper.
-
-See `docs/Getting_Started.md` for more.
-
-
-## More docs
-- docs/Project_Overview.md
-- docs/Roadmap.md
-- docs/Compatibility.md
-- docs/ID_Registry.md
-- docs/CLI_Conventions.md
-
-
-## Ultimate Pack v5 additions
-- ADRs (`docs/adr/`) and RFCs (`docs/rfc/`)
-- Plan runner and journal specifications
-- Contribution & security policy docs and GitHub templates
-- Artifact manifest generation + validation tools
+- Replace `<YOUR_CERT_THUMBPRINT>` when you define signing.
+- In v1, signatureRequired may be relaxed; in Managed/Locked modes it should be true.

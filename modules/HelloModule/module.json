@@ -78,11 +78,5 @@
     "signatureRequired": false,
     "contentSignatureRequired": false,
     "publisherThumbprintsAllowlist": []
-  },
-  "entrypoint": "module.psm1",
-  "apiLevel": 1,
-  "supportedPlatforms": [
-    "win32"
-  ],
-  "minPowerShellVersion": "7.2"
+  }
 }
