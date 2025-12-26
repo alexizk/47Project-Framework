@@ -1,0 +1,48 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>CI_Pipeline.md</title>
+<style>
+body { font-family: system-ui, Segoe UI, Arial, sans-serif; margin: 2rem; line-height: 1.5; max-width: 1100px; }
+pre { white-space: pre-wrap; word-wrap: break-word; background: #f6f8fa; padding: 1rem; border-radius: 12px; }
+code { background: #f6f8fa; padding: 0.1rem 0.2rem; border-radius: 6px; }
+a { color: #0b57d0; }
+table { border-collapse: collapse; }
+td, th { border: 1px solid #ddd; padding: 6px 10px; }
+</style>
+</head>
+<body>
+<h1>CI Pipeline (skeleton)</h1>
+
+<p>Recommended minimal CI steps:</p>
+
+<ol>
+<li><p>Lint / formatting</p>
+
+<ul>
+<li>Ensure UTF-8, LF, and EditorConfig compliance (best-effort).</li>
+</ul></li>
+<li><p>Tests</p>
+
+<ul>
+<li>Run Pester tests in <code>/tests</code>.</li>
+</ul></li>
+<li><p>Validate JSON</p>
+
+<ul>
+<li>Validate module manifests and plans against schemas.</li>
+</ul></li>
+<li><p>Build artifacts</p>
+
+<ul>
+<li>Create a release zip.</li>
+<li>Optionally sign plans/bundles and publish signatures.</li>
+</ul></li>
+</ol>
+
+<p>See <code>.github/workflows/ci.yml</code>.</p>
+
+</body>
+</html>

@@ -1,0 +1,89 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "47Project Trust Store v1",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "updatedAt",
+    "publishers",
+    "trustedArtifactHashes"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "type": "string"
+    },
+    "updatedAt": {
+      "type": "string"
+    },
+    "publishers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "publisherId",
+          "displayName",
+          "publicKeyPath"
+        ],
+        "properties": {
+          "publisherId": {
+            "type": "string"
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "publicKeyPath": {
+            "type": "string"
+          },
+          "enabled": {
+            "type": "boolean",
+            "default": true
+          },
+          "keys": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "keyId",
+                "thumbprint",
+                "status"
+              ],
+              "properties": {
+                "keyId": {
+                  "type": "string"
+                },
+                "thumbprint": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "active",
+                    "retired",
+                    "revoked"
+                  ]
+                },
+                "validFrom": {
+                  "type": "string"
+                },
+                "validTo": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            "default": []
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "trustedArtifactHashes": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-f0-9]{64}$"
+      }
+    }
+  },
+  "additionalProperties": true
+}

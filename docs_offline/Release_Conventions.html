@@ -1,0 +1,51 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Release_Conventions.md</title>
+<style>
+body { font-family: system-ui, Segoe UI, Arial, sans-serif; margin: 2rem; line-height: 1.5; max-width: 1100px; }
+pre { white-space: pre-wrap; word-wrap: break-word; background: #f6f8fa; padding: 1rem; border-radius: 12px; }
+code { background: #f6f8fa; padding: 0.1rem 0.2rem; border-radius: 6px; }
+a { color: #0b57d0; }
+table { border-collapse: collapse; }
+td, th { border: 1px solid #ddd; padding: 6px 10px; }
+</style>
+</head>
+<body>
+<h1>Release Conventions</h1>
+
+<p>Releases are <strong>zip-first</strong> and can be created without MSI/EXE installers.</p>
+
+<h2>Artifact names</h2>
+
+<ul>
+<li><code>47Project_Framework_Ultimate_Pack_vX.zip</code></li>
+<li>Optional signed bundle: <code>.47bundle</code></li>
+</ul>
+
+<h2>Required release artifacts</h2>
+
+<ul>
+<li>Zip pack</li>
+<li><code>artifacts/manifest.json</code> and checksums</li>
+<li>Signature verification instructions</li>
+</ul>
+
+<h2>Release checklist</h2>
+
+<ol>
+<li>Run: <code>./tools/Release-47.ps1</code></li>
+<li>Ensure CI is green (tests, style, security scan).</li>
+<li>Update <code>CHANGELOG.md</code> (or generate via <code>Generate-47Changelog.ps1</code>).</li>
+<li>Tag the release (e.g., <code>v1.2.0</code>) and publish the zip + signature.</li>
+</ol>
+
+<h2>Signing</h2>
+
+<p>Prefer publisher signing (trust store) for distribution.
+For dev builds, allow hash pinning in policy/trust store.</p>
+
+</body>
+</html>

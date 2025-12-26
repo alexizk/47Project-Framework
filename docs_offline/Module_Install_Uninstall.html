@@ -1,0 +1,22 @@
+    <!doctype html>
+    <html><head><meta charset="utf-8"/><title>Module Install / Uninstall</title></head>
+    <body>
+    <h1>Module Install / Uninstall</h1>
+    <pre style="white-space:pre-wrap;font-family:system-ui,Segoe UI,Arial"># Module Install / Uninstall
+
+## Install flow (atomic)
+1. Acquire artifact (repo sync / local bundle / local folder)
+2. Quarantine extract to temp
+3. Validate:
+   - manifest schema
+   - file hashes
+   - signature/trust (publisher or hash pin)
+4. Stage into final location atomically
+5. Write journal entry + optional snapshot
+
+## Uninstall
+- Remove module binaries
+- Optionally preserve user data (default: preserve)
+- Journal entry recorded
+</pre>
+    </body></html>

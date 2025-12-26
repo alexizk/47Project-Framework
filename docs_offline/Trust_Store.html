@@ -1,0 +1,40 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Trust_Store.md</title>
+<style>
+body { font-family: system-ui, Segoe UI, Arial, sans-serif; margin: 2rem; line-height: 1.5; max-width: 1100px; }
+pre { white-space: pre-wrap; word-wrap: break-word; background: #f6f8fa; padding: 1rem; border-radius: 12px; }
+code { background: #f6f8fa; padding: 0.1rem 0.2rem; border-radius: 6px; }
+a { color: #0b57d0; }
+table { border-collapse: collapse; }
+td, th { border: 1px solid #ddd; padding: 6px 10px; }
+</style>
+</head>
+<body>
+<h1>Trust Store</h1>
+
+<p>The trust store controls which publishers / artifacts are trusted.</p>
+
+<h2>Files</h2>
+
+<ul>
+<li><code>trust/publishers.json</code> — allowlist of trusted publishers (by public key path)</li>
+<li><code>trust/keys/</code> — place public keys/certs here</li>
+</ul>
+
+<h2>Modes</h2>
+
+<ul>
+<li>Publisher trust: trust any artifact signed by a trusted publisher</li>
+<li>Pinning: trust a specific artifact hash (SHA-256)</li>
+</ul>
+
+<h2>Default</h2>
+
+<p>The default pack ships with an <strong>empty allowlist</strong>. Add publishers intentionally.</p>
+
+</body>
+</html>

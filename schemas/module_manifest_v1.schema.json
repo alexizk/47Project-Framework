@@ -1,0 +1,151 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://47project/schemas/module_manifest_v1.schema.json",
+  "title": "47Project Module Manifest v1",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "moduleId",
+    "displayName",
+    "version",
+    "minFrameworkVersion",
+    "publisher",
+    "description",
+    "capabilities",
+    "riskProfile",
+    "trust"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "type": "integer",
+      "const": 1
+    },
+    "moduleId": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_.-]{2,64}$"
+    },
+    "displayName": {
+      "type": "string",
+      "minLength": 2,
+      "maxLength": 128
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+(-[0-9A-Za-z.-]+)?$"
+    },
+    "minFrameworkVersion": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+(-[0-9A-Za-z.-]+)?$"
+    },
+    "publisher": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4096
+    },
+    "category": {
+      "type": "string"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": []
+    },
+    "entrypoint": {
+      "type": "string",
+      "description": "Relative path to module entrypoint (psm1/ps1)."
+    },
+    "ui": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "settings": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "capabilities": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^cap\\.[a-z0-9_.-]+$"
+      },
+      "minItems": 1
+    },
+    "riskProfile": {
+      "type": "object",
+      "required": [
+        "defaultRiskLevel",
+        "unsafeRequiresExplicitEnable",
+        "unsafeUIWarnings"
+      ],
+      "properties": {
+        "defaultRiskLevel": {
+          "type": "string",
+          "enum": [
+            "Safe",
+            "Caution",
+            "Unsafe"
+          ]
+        },
+        "unsafeRequiresExplicitEnable": {
+          "type": "boolean"
+        },
+        "unsafeUIWarnings": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": true
+    },
+    "trust": {
+      "type": "object",
+      "required": [
+        "signatureRequired",
+        "contentSignatureRequired",
+        "publisherThumbprintsAllowlist"
+      ],
+      "properties": {
+        "signatureRequired": {
+          "type": "boolean"
+        },
+        "contentSignatureRequired": {
+          "type": "boolean"
+        },
+        "publisherThumbprintsAllowlist": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "apiLevel": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Module API compatibility level."
+    },
+    "minPowerShellVersion": {
+      "type": "string",
+      "description": "Minimum PowerShell version required, e.g. 7.2"
+    },
+    "supportedPlatforms": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "win32",
+          "linux",
+          "darwin"
+        ]
+      },
+      "description": "Platforms supported by this module."
+    }
+  },
+  "additionalProperties": true
+}

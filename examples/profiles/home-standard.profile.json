@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "profileId": "home-standard",
+  "name": "Home / Standard",
+  "description": "Common apps for a typical machine.",
+  "apps": [
+    "7zip",
+    "vscode",
+    "git",
+    "chrome"
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://47project/schemas/telemetry_config_v1.schema.json",
+  "title": "47Project Telemetry Config v1",
+  "type": "object",
+  "properties": {
+    "enabled": {
+      "type": "boolean"
+    },
+    "localOnly": {
+      "type": "boolean"
+    }
+  },
+  "additionalProperties": false
+}

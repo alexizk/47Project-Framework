@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "allowUnsafe": true,
+  "capabilityGrants": {
+    "global": [
+      "*"
+    ],
+    "modules": {
+      "AppSCrawler": [
+        "*"
+      ],
+      "IdentityKit": [
+        "*"
+      ],
+      "HelloModule": [
+        "*"
+      ]
+    }
+  },
+  "ui": {
+    "warnOnUnsafe": true,
+    "showAdvancedByDefault": true
+  },
+  "notes": "Allows unsafe actions. Use at your own risk."
+}

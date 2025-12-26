@@ -1,0 +1,88 @@
+{
+  "schemaVersion": 1,
+  "moduleId": "HelloModule",
+  "displayName": "HelloModule",
+  "version": "1.0.0",
+  "minFrameworkVersion": "1.0.0",
+  "publisher": "47Project",
+  "description": "Minimal example module for testing discovery, nav, and settings.",
+  "category": "Dev",
+  "tags": [
+    "example"
+  ],
+  "ui": {
+    "icon": "assets/icon.png",
+    "defaultRoute": "/hello",
+    "allowPopOut": false,
+    "navigation": [
+      {
+        "id": "hello",
+        "title": "Hello",
+        "route": "/hello"
+      },
+      {
+        "id": "settings",
+        "title": "Settings",
+        "route": "/hello/settings"
+      }
+    ]
+  },
+  "settings": {
+    "rootKey": "Framework.Modules.HelloModule",
+    "storageScopes": {
+      "policy": [],
+      "machine": [],
+      "user": [
+        "*"
+      ]
+    },
+    "pages": [
+      {
+        "id": "hello.settings",
+        "title": "Hello Settings",
+        "route": "/hello/settings",
+        "groups": [
+          {
+            "id": "basic",
+            "title": "Basic",
+            "controls": [
+              {
+                "key": "ui.greeting",
+                "type": "text",
+                "title": "Greeting",
+                "default": "Hello, 47Project!",
+                "risk": "Safe"
+              },
+              {
+                "key": "ui.showAdvanced",
+                "type": "toggle",
+                "title": "Show advanced",
+                "default": false,
+                "risk": "Safe"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "capabilities": [
+    "cap.logs.write"
+  ],
+  "riskProfile": {
+    "defaultRiskLevel": "Safe",
+    "unsafeRequiresExplicitEnable": true,
+    "unsafeUIWarnings": true
+  },
+  "trust": {
+    "signatureRequired": false,
+    "contentSignatureRequired": false,
+    "publisherThumbprintsAllowlist": []
+  },
+  "entrypoint": "module.psm1",
+  "apiLevel": 1,
+  "supportedPlatforms": [
+    "win32"
+  ],
+  "minPowerShellVersion": "7.2"
+}

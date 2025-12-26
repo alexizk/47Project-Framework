@@ -1,0 +1,175 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Naming_Conventions.md</title>
+<style>
+body { font-family: system-ui, Segoe UI, Arial, sans-serif; margin: 2rem; line-height: 1.5; max-width: 1100px; }
+pre { white-space: pre-wrap; word-wrap: break-word; background: #f6f8fa; padding: 1rem; border-radius: 12px; }
+code { background: #f6f8fa; padding: 0.1rem 0.2rem; border-radius: 6px; }
+a { color: #0b57d0; }
+table { border-collapse: collapse; }
+td, th { border: 1px solid #ddd; padding: 6px 10px; }
+</style>
+</head>
+<body>
+<h1>Naming Conventions</h1>
+
+<p>This document standardizes names across <strong>modules, capabilities, commands, events, files, and IDs</strong> so the project stays coherent as it grows.</p>
+
+<h2>General rules</h2>
+
+<ul>
+<li>Prefer <strong>clarity over brevity</strong>.</li>
+<li>Names must be <strong>stable</strong> once published. If you must change a public name/ID, use deprecation and migration.</li>
+<li>Use <strong>ASCII</strong> for IDs and filenames unless there is a strong reason otherwise.</li>
+</ul>
+
+<h2>IDs</h2>
+
+<h3>Module IDs</h3>
+
+<p>Format: <code>mod.&lt;namespace&gt;.&lt;name&gt;</code><br />
+Examples:
+- <code>mod.47.systeminfo</code>
+- <code>mod.47.nettools</code>
+- <code>mod.vendor.product</code></p>
+
+<p>Rules:
+- Lowercase, dot-separated.
+- Avoid generic names (<code>mod.tools</code>, <code>mod.utils</code>)—be specific.</p>
+
+<h3>Capability IDs</h3>
+
+<p>Format: <code>cap.&lt;domain&gt;.&lt;verb&gt;</code> (optionally add a qualifier)<br />
+Examples:
+- <code>cap.inventory.read</code>
+- <code>cap.network.scan</code>
+- <code>cap.filesystem.write.temp</code>
+- <code>cap.registry.write</code></p>
+
+<p>Rules:
+- Use verbs like <code>read</code>, <code>write</code>, <code>execute</code>, <code>download</code>, <code>install</code>, <code>scan</code>.
+- Keep the meaning narrow and enforceable.</p>
+
+<h3>Plan IDs</h3>
+
+<p>Format: <code>plan.&lt;namespace&gt;.&lt;purpose&gt;</code><br />
+Examples:
+- <code>plan.47.bootstrap.dev</code>
+- <code>plan.47.update.framework</code></p>
+
+<h3>Bundle IDs</h3>
+
+<p>Format: <code>bundle.&lt;namespace&gt;.&lt;name&gt;</code><br />
+Examples:
+- <code>bundle.47.framework.core</code>
+- <code>bundle.47.modules.tools</code></p>
+
+<h3>Policy IDs</h3>
+
+<p>Format: <code>policy.&lt;namespace&gt;.&lt;profile&gt;</code><br />
+Examples:
+- <code>policy.47.default</code>
+- <code>policy.47.developer</code>
+- <code>policy.47.lockeddown</code></p>
+
+<h2>CLI and PowerShell commands</h2>
+
+<h3>CLI verbs</h3>
+
+<p>Use lowercase CLI verbs and subcommands:
+- <code>47 help</code>
+- <code>47 doctor</code>
+- <code>47 modules list</code>
+- <code>47 plan validate</code>
+- <code>47 plan run --whatif</code></p>
+
+<h3>PowerShell function names</h3>
+
+<p>Format: <code>Verb-47Noun</code> (PowerShell approved verbs when possible)<br />
+Examples:
+- <code>Get-47Modules</code>
+- <code>Invoke-47Doctor</code>
+- <code>Test-47Policy</code>
+- <code>Save-47Snapshot</code>
+- <code>Restore-47Snapshot</code></p>
+
+<p>Rules:
+- Nouns use <strong>PascalCase</strong>.
+- Avoid abbreviations unless widely understood (<code>Id</code>, <code>Url</code>, <code>Json</code>).</p>
+
+<h3>Output modes</h3>
+
+<p>Every CLI command should support:
+- human-readable (default)
+- <code>--json</code> (machine-readable)</p>
+
+<h2>Logging and event IDs</h2>
+
+<h3>Event IDs</h3>
+
+<p>Format:
+- Framework core: <code>FWK0001</code>, <code>FWK0002</code>, ...
+- Module events: <code>MOD1001</code>, <code>MOD1002</code>, ... (or module-specific prefixes if needed)</p>
+
+<p>Rules:
+- One event ID = one meaning (don’t reuse).
+- Events that indicate security-sensitive actions must include the relevant policy gate/capability in the record.</p>
+
+<h2>Files and folders</h2>
+
+<h3>Docs</h3>
+
+<ul>
+<li>Markdown docs in <code>docs/</code> use <strong>PascalCase</strong> filenames:
+<ul>
+<li><code>Trust_Model.md</code>, <code>Plan_Runner_Spec.md</code></li>
+</ul></li>
+<li>ADRs and RFCs use <strong>kebab-case</strong> with numeric prefix:
+<ul>
+<li><code>docs/adr/0001-powerShell-versions.md</code></li>
+<li><code>docs/rfc/0002-plan-step-types.md</code></li>
+</ul></li>
+</ul>
+
+<h3>Schemas</h3>
+
+<p><code>schemas/&lt;name&gt;_v&lt;major&gt;.schema.json</code><br />
+Examples:
+- <code>module_manifest_v1.schema.json</code>
+- <code>plan_v1.schema.json</code></p>
+
+<h3>JSON keys</h3>
+
+<ul>
+<li>Use <strong>camelCase</strong> keys.</li>
+<li>Use consistent suffixes:
+<ul>
+<li><code>...Id</code>, <code>...Version</code>, <code>...Hash</code>, <code>...Path</code>, <code>...Url</code></li>
+</ul></li>
+<li>Avoid polymorphic fields unless necessary; prefer explicit structures.</li>
+</ul>
+
+<h2>Deprecation and migration naming</h2>
+
+<ul>
+<li>Deprecated fields: keep the name, mark as deprecated in docs/schema, and provide a migration path.</li>
+<li>Migration scripts: <code>Framework/Core/Migrations/&lt;version&gt;/Migrate-&lt;thing&gt;.ps1</code> (or similar), with clear version bounds.</li>
+</ul>
+
+<h2>Examples</h2>
+
+<p><strong>Good</strong>
+- <code>cap.filesystem.write.temp</code>
+- <code>mod.47.registryPolicyViewer</code>
+- <code>Invoke-47FirstRun</code></p>
+
+<p><strong>Avoid</strong>
+- <code>cap.doStuff</code>
+- <code>mod.tools</code>
+- <code>run47</code> (not a standard PowerShell verb form)</p>
+
+</body>
+</html>

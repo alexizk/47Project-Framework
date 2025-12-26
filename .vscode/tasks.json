@@ -1,0 +1,29 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "47: Tests",
+      "type": "shell",
+      "command": "pwsh -NoProfile -File tools/Invoke-47Tests.ps1",
+      "problemMatcher": []
+    },
+    {
+      "label": "47: Style Check",
+      "type": "shell",
+      "command": "pwsh -NoProfile -File tools/Invoke-47StyleCheck.ps1",
+      "problemMatcher": []
+    },
+    {
+      "label": "47: Build Offline Docs",
+      "type": "shell",
+      "command": "pwsh -NoProfile -File tools/Build-47Docs.ps1",
+      "problemMatcher": []
+    },
+    {
+      "label": "47: Release",
+      "type": "shell",
+      "command": "pwsh -NoProfile -File tools/Release-47.ps1",
+      "problemMatcher": []
+    }
+  ]
+}

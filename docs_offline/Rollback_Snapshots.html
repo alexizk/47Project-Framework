@@ -1,0 +1,47 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Rollback_Snapshots.md</title>
+<style>
+body { font-family: system-ui, Segoe UI, Arial, sans-serif; margin: 2rem; line-height: 1.5; max-width: 1100px; }
+pre { white-space: pre-wrap; word-wrap: break-word; background: #f6f8fa; padding: 1rem; border-radius: 12px; }
+code { background: #f6f8fa; padding: 0.1rem 0.2rem; border-radius: 6px; }
+a { color: #0b57d0; }
+table { border-collapse: collapse; }
+td, th { border: 1px solid #ddd; padding: 6px 10px; }
+</style>
+</head>
+<body>
+<h1>Rollback Snapshots</h1>
+
+<p>Snapshots are local backups created before risky operations (updates, bulk changes).</p>
+
+<h2>Where</h2>
+
+<ul>
+<li>User snapshots live under: <code>%LOCALAPPDATA%\47Project\Framework\Snapshots</code></li>
+</ul>
+
+<h2>What’s inside</h2>
+
+<p>A snapshot can include:
+- User data (config, caches)
+- Machine policy/config (best-effort)
+- (Optional) the <strong>pack folder</strong> itself (for update rollback)</p>
+
+<h2>Commands</h2>
+
+<ul>
+<li>Create: <code>pwsh -File .\tools\Save-47Snapshot.ps1 -IncludePack</code></li>
+<li>List: <code>pwsh -File .\tools\Get-47Snapshots.ps1</code></li>
+<li>Restore: <code>pwsh -File .\tools\Restore-47Snapshot.ps1 -SnapshotPath &lt;path&gt;</code></li>
+</ul>
+
+<blockquote>
+  <p>Restoring the pack is staged to a separate folder for safety; you can swap manually.</p>
+</blockquote>
+
+</body>
+</html>

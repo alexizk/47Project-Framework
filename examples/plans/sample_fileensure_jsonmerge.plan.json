@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "hashSpecVersion": 1,
+  "createdAt": "2025-12-26T03:55:11Z",
+  "frameworkVersion": "1.x",
+  "moduleId": "framework.core",
+  "action": "demo.file.json",
+  "targets": {
+    "machine": "local"
+  },
+  "steps": [
+    {
+      "stepId": "mkdir",
+      "type": "dir.ensure",
+      "risk": "safe",
+      "dirEnsure": {
+        "path": "./tmp_demo",
+        "ensure": "present"
+      }
+    },
+    {
+      "stepId": "file",
+      "type": "file.ensure",
+      "risk": "safe",
+      "fileEnsure": {
+        "path": "./tmp_demo/demo.txt",
+        "op": "write",
+        "content": "hello\n",
+        "encoding": "utf8"
+      }
+    },
+    {
+      "stepId": "merge",
+      "type": "json.merge",
+      "risk": "safe",
+      "jsonMerge": {
+        "path": "./tmp_demo/config.json",
+        "merge": {
+          "enabled": true,
+          "count": 1
+        }
+      }
+    }
+  ],
+  "planHash": "PLACEHOLDER"
+}

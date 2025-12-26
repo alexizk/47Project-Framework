@@ -1,0 +1,51 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Offline_Bundle_47bundle_Spec_v1.md</title>
+<style>
+body { font-family: system-ui, Segoe UI, Arial, sans-serif; margin: 2rem; line-height: 1.5; max-width: 1100px; }
+pre { white-space: pre-wrap; word-wrap: break-word; background: #f6f8fa; padding: 1rem; border-radius: 12px; }
+code { background: #f6f8fa; padding: 0.1rem 0.2rem; border-radius: 6px; }
+a { color: #0b57d0; }
+table { border-collapse: collapse; }
+td, th { border: 1px solid #ddd; padding: 6px 10px; }
+</style>
+</head>
+<body>
+<h1>Offline Bundle Format (.47bundle) Spec v1</h1>
+
+<p>A <code>.47bundle</code> is a zip file designed for offline distribution.</p>
+
+<h2>Contents</h2>
+
+<ul>
+<li><code>bundle.json</code> (root manifest)</li>
+<li><code>modules/</code> (module packages or module directories)</li>
+<li><code>catalogs/</code> (app catalogs)</li>
+<li><code>profiles/</code> (profiles)</li>
+<li><code>docs/</code> (optional)</li>
+<li><code>flags/</code> (feature flags, optional)</li>
+<li><code>signatures/</code> (signature + hashes)</li>
+</ul>
+
+<h2>bundle.json fields</h2>
+
+<ul>
+<li><code>schemaVersion</code></li>
+<li><code>createdAt</code></li>
+<li><code>publisher</code></li>
+<li><code>components</code>: list of included components with hashes</li>
+<li><code>trust</code>: signature requirements</li>
+</ul>
+
+<h2>Verification</h2>
+
+<ul>
+<li>Framework verifies <code>bundle.json</code> signature and each component hash.</li>
+<li>If policy requires signatures, unsigned bundles are blocked.</li>
+</ul>
+
+</body>
+</html>

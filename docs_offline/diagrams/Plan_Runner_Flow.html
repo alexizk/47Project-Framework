@@ -1,0 +1,35 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>diagrams/Plan_Runner_Flow.md</title>
+<style>
+body { font-family: system-ui, Segoe UI, Arial, sans-serif; margin: 2rem; line-height: 1.5; max-width: 1100px; }
+pre { white-space: pre-wrap; word-wrap: break-word; background: #f6f8fa; padding: 1rem; border-radius: 12px; }
+code { background: #f6f8fa; padding: 0.1rem 0.2rem; border-radius: 6px; }
+a { color: #0b57d0; }
+table { border-collapse: collapse; }
+td, th { border: 1px solid #ddd; padding: 6px 10px; }
+</style>
+</head>
+<body>
+<h1>Plan Runner Flow (Mermaid)</h1>
+
+<pre><code>flowchart TD
+  A[Load plan.json] --&gt; B[Validate schema + hash/spec]
+  B --&gt; C[Verify signature/trust]
+  C --&gt; D[Resolve effective policy + config]
+  D --&gt; E{Mode}
+  E --&gt;|WhatIf| F[Simulate steps + policy gates]
+  E --&gt;|Apply| G[Create snapshot + journal runId]
+  G --&gt; H[Execute steps (idempotent)]
+  H --&gt; I{Failure?}
+  I --&gt;|No| J[Commit journal + success]
+  I --&gt;|Yes| K{ContinueOnError?}
+  K --&gt;|Yes| H
+  K --&gt;|No| L[Rollback (optional) + finalize journal]
+</code></pre>
+
+</body>
+</html>

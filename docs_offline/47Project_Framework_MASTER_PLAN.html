@@ -1,0 +1,603 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>47Project_Framework_MASTER_PLAN.md</title>
+<style>
+body { font-family: system-ui, Segoe UI, Arial, sans-serif; margin: 2rem; line-height: 1.5; max-width: 1100px; }
+pre { white-space: pre-wrap; word-wrap: break-word; background: #f6f8fa; padding: 1rem; border-radius: 12px; }
+code { background: #f6f8fa; padding: 0.1rem 0.2rem; border-radius: 6px; }
+a { color: #0b57d0; }
+table { border-collapse: collapse; }
+td, th { border: 1px solid #ddd; padding: 6px 10px; }
+</style>
+</head>
+<body>
+<h1>47Project Framework — Master Plan A–Z (Master Reference)</h1>
+
+<p><strong>Product name (user-facing):</strong> 47Project Framework<br />
+<strong>Shell codename (internal):</strong> Nexus<br />
+<strong>Timezone reference:</strong> Europe/Bucharest  </p>
+
+<hr />
+
+<h2>1. Vision</h2>
+
+<p>Build a single, iconic Windows launcher (<strong>47Project Framework</strong>) that hosts multiple internal “apps” as <strong>modules</strong> (e.g., AppSCrawler, IdentityKit). Users experience separate workspaces and settings per module, while the platform guarantees consistency, safety controls, trust, and observability.</p>
+
+<h3>1.1 Success criteria</h3>
+
+<ul>
+<li>One cohesive app experience: fast startup, consistent navigation, module isolation.</li>
+<li>One execution engine path: UI and headless/CLI share the same plan → validate → execute pipeline.</li>
+<li>“Ultimate” power remains available, but <strong>risk is explicit</strong> and <strong>policy controls are enforceable</strong>.</li>
+<li>Offline-first + trusted content model (signed modules/content/plans).</li>
+<li>Diagnostics and supportability are first-class.</li>
+</ul>
+
+<h3>1.2 Non-goals (v1 defaults)</h3>
+
+<ul>
+<li>Remote takeover/remote control.</li>
+<li>Always-on background service <em>by default</em> (service is optional in productized version).</li>
+<li>Forcing enterprise-only restrictions on everyone.</li>
+</ul>
+
+<hr />
+
+<h2>2. Principles</h2>
+
+<ol>
+<li><strong>Monolith distribution, modular architecture</strong>: one launcher, modular internals.</li>
+<li><strong>Determinism on demand</strong>: plans/hashes/approval when enabled.</li>
+<li><strong>Power with guardrails</strong>: unsafe features are available only via explicit toggles.</li>
+<li><strong>Everything observable</strong>: run reports, structured logs, inventory snapshots, diffs.</li>
+<li><strong>Offline-first</strong>: caches + signed bundles for disconnected environments.</li>
+</ol>
+
+<hr />
+
+<h2>3. High-level Architecture</h2>
+
+<h3>3.1 Components</h3>
+
+<ul>
+<li><strong>Nexus Shell (Framework UI)</strong>
+<ul>
+<li>Navigation, workspace management, settings host, command palette, trust center, diagnostics center.</li>
+</ul></li>
+<li><strong>Framework Core Services</strong>
+<ul>
+<li>Policy service, trust service, storage service, logging/telemetry service, scheduler service (task-based), module loader.</li>
+</ul></li>
+<li><strong>Modules</strong>
+<ul>
+<li>Each module declares UI pages, settings pages, capabilities, and optional CLI commands.</li>
+</ul></li>
+<li><strong>Execution Engine</strong>
+<ul>
+<li>Plan builder, validator, step runner, report generator (shared by UI + CLI).</li>
+</ul></li>
+</ul>
+
+<h3>3.2 Data flow (canonical)</h3>
+
+<ol>
+<li>Discover/load modules → validate trust/policy.</li>
+<li>User selects action (UI) or command (CLI).</li>
+<li>Build plan → canonicalize → hash.</li>
+<li>Validate plan (policy gates, trust, risk).</li>
+<li>Execute steps (download → install/update/uninstall → post-check).</li>
+<li>Generate report + snapshots + diffs → surface results.</li>
+</ol>
+
+<hr />
+
+<h2>4. Startup Pipeline (Nexus)</h2>
+
+<h3>4.1 Phases (deterministic)</h3>
+
+<ol>
+<li><strong>Bootstrap</strong>: initialize paths, logging, minimal UI.</li>
+<li><strong>Trust Init</strong>: load embedded public cert(s), initialize verification.</li>
+<li><strong>Policy Load</strong>: load HKLM/HKCU + local JSON policy overlays.</li>
+<li><strong>Feature Flags Load</strong>: local cache + optional signed remote awareness (read-only).</li>
+<li><strong>UI Bootstrap</strong>: build shell, command palette, nav.</li>
+<li><strong>Module Discovery</strong>: scan modules, validate manifests, validate signatures.</li>
+<li><strong>Remote Awareness (optional)</strong>: advisories/versions/flags (no remote exec).</li>
+<li><strong>Ready</strong>: show home dashboard.</li>
+</ol>
+
+<h3>4.2 Startup performance goals</h3>
+
+<ul>
+<li>Shell visible quickly with lazy module hydration.</li>
+<li>Background indexing throttled.</li>
+<li>Startup profiling panel available in Diagnostics.</li>
+</ul>
+
+<hr />
+
+<h2>5. Navigation &amp; UX</h2>
+
+<h3>5.1 Shell layout</h3>
+
+<ul>
+<li>Left navigation:
+<ul>
+<li><strong>Home</strong></li>
+<li><strong>Modules</strong> (list)
+<ul>
+<li>AppSCrawler</li>
+<li>IdentityKit</li>
+<li>…</li>
+</ul></li>
+<li><strong>Plan Hub</strong></li>
+<li><strong>Diagnostics</strong></li>
+<li><strong>Trust Center</strong></li>
+<li><strong>Framework Settings</strong></li>
+</ul></li>
+</ul>
+
+<h3>5.2 Module workspaces</h3>
+
+<ul>
+<li>Each module provides:
+<ul>
+<li>Workspace pages (Overview, Operations, History, etc.)</li>
+<li>A dedicated <strong>Module Settings</strong> section (module-only)</li>
+<li>Optional <strong>Pop-out window</strong> (still Framework process)</li>
+</ul></li>
+</ul>
+
+<h3>5.3 Command Palette (Ctrl+K)</h3>
+
+<ul>
+<li>Global search across:
+<ul>
+<li>modules, pages, actions, settings, recent runs, docs</li>
+</ul></li>
+<li>Supports quick actions:
+<ul>
+<li>“Run last plan”, “Open AppSCrawler Settings”, “Export support bundle”</li>
+</ul></li>
+</ul>
+
+<h3>5.4 Workspace system</h3>
+
+<ul>
+<li>Save/restore named layouts (“App Management”, “Diagnostics”, “Identity Ops”).</li>
+<li>Reopen last workspace on launch.</li>
+<li>Crash recovery: offer “resume/discard” unfinished plan view.</li>
+</ul>
+
+<hr />
+
+<h2>6. Module System</h2>
+
+<h3>6.1 Module manifest v1</h3>
+
+<ul>
+<li>File: <code>modules/&lt;ModuleId&gt;/module.json</code> (or embedded later)</li>
+<li>Required sections:
+<ul>
+<li>Identity: schemaVersion, moduleId, displayName, version, minFrameworkVersion</li>
+<li>UI: navigation pages, defaultRoute, allowPopOut, icons</li>
+<li>Settings: rootKey, pages/groups, storageScopes mapping</li>
+<li>Capabilities: list of capability IDs</li>
+<li>Risk profile: default risk, unsafe gating</li>
+<li>Trust: signatureRequired, allowed publishers/thumbprints</li>
+<li>Dependencies: dependsOn/conflictsWith</li>
+</ul></li>
+</ul>
+
+<h3>6.2 Module lifecycle hooks</h3>
+
+<ul>
+<li>OnLoad, OnReady, OnPolicyChanged, OnNetworkStateChanged, OnShutdown</li>
+</ul>
+
+<h3>6.3 Module SDK (Framework-provided services)</h3>
+
+<ul>
+<li>Logger</li>
+<li>Policy</li>
+<li>Trust verification</li>
+<li>Storage</li>
+<li>Scheduler</li>
+<li>Notifications</li>
+<li>IPC/API client</li>
+<li>UI navigation utilities</li>
+</ul>
+
+<h3>6.4 Module packaging (optional)</h3>
+
+<ul>
+<li><code>.47module</code> (zip) containing:
+<ul>
+<li>module.json</li>
+<li>binaries/assets</li>
+<li>signature manifest</li>
+</ul></li>
+</ul>
+
+<hr />
+
+<h2>7. Capability Catalog v1 (Permissions)</h2>
+
+<p>Capabilities are global IDs the Framework enforces.</p>
+
+<h3>7.1 Examples</h3>
+
+<ul>
+<li>Software: cap.software.install, cap.software.update, cap.software.uninstall, cap.software.msi, cap.software.msix</li>
+<li>Unsafe: cap.software.registry<em>uninstall</em>unsafe, cap.module.custom<em>hooks</em>unsafe</li>
+<li>Network: cap.download.network, cap.download.proxy, cap.download.certpin</li>
+<li>Policy: cap.policy.read, cap.policy.write_admin</li>
+<li>Observability: cap.logs.write, cap.eventlog.write, cap.diagnostics.bundle</li>
+</ul>
+
+<h3>7.2 Enforcement UX</h3>
+
+<ul>
+<li>Modules declare requested capabilities.</li>
+<li>Framework shows a “Permissions/Trust” view per module.</li>
+<li>Policy can block module load or block specific actions.</li>
+</ul>
+
+<hr />
+
+<h2>8. Settings System</h2>
+
+<h3>8.1 Three-tier storage</h3>
+
+<ul>
+<li><strong>Policy (enforced):</strong> HKLM + policy.json (managed rules)</li>
+<li><strong>Machine state:</strong> ProgramData (cache, downloads store index, inventory snapshots)</li>
+<li><strong>User prefs:</strong> HKCU/LocalAppData (UI prefs, defaults)</li>
+</ul>
+
+<h3>8.2 Settings rendering</h3>
+
+<ul>
+<li>Modules define settings pages in manifest.</li>
+<li>Framework renders them with consistent components.</li>
+</ul>
+
+<h3>8.3 Settings hygiene</h3>
+
+<ul>
+<li>Settings keys are namespaced: <code>Framework.Modules.&lt;ModuleId&gt;.*</code></li>
+<li>Schema validation for settings.</li>
+<li>Export/import settings per module.</li>
+</ul>
+
+<hr />
+
+<h2>9. Trust &amp; Supply Chain</h2>
+
+<h3>9.1 Trust goals</h3>
+
+<ul>
+<li>Offline-first, signature-verified content.</li>
+<li>Clear user-facing status.</li>
+</ul>
+
+<h3>9.2 What can be signed</h3>
+
+<ul>
+<li>Module packages/manifests</li>
+<li>Catalogs/profiles/providers for AppSCrawler</li>
+<li>Plans (optional)</li>
+<li>Feature flags/content manifests (optional)</li>
+</ul>
+
+<h3>9.3 Trust Center (UX)</h3>
+
+<ul>
+<li>Shows:
+<ul>
+<li>module signature status</li>
+<li>publisher info</li>
+<li>catalog/provider signature status</li>
+<li>unsafe mode status + why</li>
+</ul></li>
+</ul>
+
+<h3>9.4 Offline bundles</h3>
+
+<ul>
+<li><code>.47bundle</code> (zip) containing:
+<ul>
+<li>modules + catalogs + profiles + docs + flags</li>
+<li>signed content manifest</li>
+</ul></li>
+</ul>
+
+<hr />
+
+<h2>10. Plan Hub (Framework-wide)</h2>
+
+<p>Plan Hub is the “heart” of the platform.</p>
+
+<h3>10.1 Plan format</h3>
+
+<ul>
+<li>Canonical JSON with stable ordering → SHA256 plan hash.</li>
+<li>Includes:
+<ul>
+<li>steps with previews</li>
+<li>risk labels</li>
+<li>policy snapshot hash</li>
+<li>module hashes</li>
+</ul></li>
+</ul>
+
+<h3>10.2 Plan operations</h3>
+
+<ul>
+<li>Preview / Dry-run</li>
+<li>Approve (if policy requires)</li>
+<li>Schedule (Task Scheduler or service-backed)</li>
+<li>Export/import <code>.47plan</code></li>
+<li>Clone/re-run</li>
+</ul>
+
+<h3>10.3 Scheduling Center</h3>
+
+<ul>
+<li>Without service: create Windows Scheduled Tasks that call Framework CLI with plan hash.</li>
+<li>With service (future): service executes scheduled plans.</li>
+</ul>
+
+<hr />
+
+<h2>11. Observability &amp; Diagnostics</h2>
+
+<h3>11.1 Logging</h3>
+
+<ul>
+<li>Human log + optional JSONL structured logs.</li>
+<li>Optional Windows Event Log channel.</li>
+<li>Secret redaction rules.</li>
+</ul>
+
+<h3>11.2 Reports</h3>
+
+<ul>
+<li>Run report artifact includes:
+<ul>
+<li>plan hash, policy hash, module versions/hashes</li>
+<li>step outcomes, exit codes, timings</li>
+<li>download verification status</li>
+</ul></li>
+</ul>
+
+<h3>11.3 Support bundle</h3>
+
+<ul>
+<li>One-click zip containing:
+<ul>
+<li>logs, reports, snapshots, policy, module list, environment info</li>
+</ul></li>
+</ul>
+
+<h3>11.4 Crash resilience</h3>
+
+<ul>
+<li>Recovery on next start (unfinished plan resume/discard)</li>
+<li>Clear “last known good” state</li>
+</ul>
+
+<hr />
+
+<h2>12. Module Spec: AppSCrawler (Ultimate)</h2>
+
+<p>AppSCrawler is the flagship “app install/update/uninstall” module.</p>
+
+<h3>12.1 Providers</h3>
+
+<ul>
+<li>winget</li>
+<li>choco</li>
+<li>MSI provider (msiexec + product code)</li>
+<li>MSIX/Appx provider</li>
+<li>download (EXE/MSI direct)</li>
+<li>portable</li>
+<li>registry uninstall (unsafe)</li>
+<li>custom script provider (unsafe)</li>
+</ul>
+
+<h3>12.2 Step model</h3>
+
+<p>Each step includes:
+- Type: Download/Install/Update/Uninstall/Detect/Hook
+- Risk: Safe/Caution/Unsafe
+- Preview: exact command/intent
+- Timeout, retries</p>
+
+<h3>12.3 Risk policy</h3>
+
+<ul>
+<li>Safe/Caution/Unsafe enforcement:
+<ul>
+<li>allow / warn / require confirm / block</li>
+</ul></li>
+<li>Headless requires explicit AllowUnsafe unless policy permits.</li>
+</ul>
+
+<h3>12.4 Downloads &amp; cache</h3>
+
+<ul>
+<li>Content-addressed cache: <code>downloads/_store/&lt;sha256&gt;__&lt;filename&gt;</code></li>
+<li>Offline mode: cache-only</li>
+<li>Hash enforcement if expected hash present</li>
+<li>Optional Authenticode enforcement</li>
+</ul>
+
+<h3>12.5 Hooks (gated)</h3>
+
+<ul>
+<li>PreInstall/PostInstall/PreUninstall/PostUninstall</li>
+<li>Preflight checks</li>
+</ul>
+
+<h3>12.6 Inventory + diffs</h3>
+
+<p>Inventory sources:
+- registry uninstall entries
+- winget list (best-effort)
+- choco list
+- appx packages
+- portable tracked installs
+Snapshots before/after run → diff report.</p>
+
+<h3>12.7 CLI</h3>
+
+<ul>
+<li><code>framework47 apps install --profile Work --yes</code></li>
+<li>Output: text/json/csv</li>
+<li>Exit codes: success/partial/policy-block/reboot-required/schema-invalid</li>
+</ul>
+
+<hr />
+
+<h2>13. Module Spec: IdentityKit (Placeholder)</h2>
+
+<ul>
+<li>Defines its own manifest, settings pages, capabilities, plans.</li>
+<li>Integrates with Plan Hub and Diagnostics.</li>
+</ul>
+
+<hr />
+
+<h2>14. Productization (EXE/MSI) Roadmap</h2>
+
+<h3>14.1 Recommended packaging</h3>
+
+<ul>
+<li>EXE bootstrapper + MSI core</li>
+<li>Optional MSIX for UI (hybrid)</li>
+</ul>
+
+<h3>14.2 Service-backed mode (ultimate)</h3>
+
+<ul>
+<li>Project47.Service runs as SYSTEM to execute plans and scheduling.</li>
+<li>UI/CLI communicate via named pipe / localhost IPC.</li>
+</ul>
+
+<h3>14.3 Update strategy</h3>
+
+<ul>
+<li>Signed update manifests.</li>
+<li>Differential updates where possible.</li>
+<li>Rollback support.</li>
+</ul>
+
+<hr />
+
+<h2>15. Phased Implementation Roadmap</h2>
+
+<h3>Phase 0 — Lock spec (this document)</h3>
+
+<ul>
+<li>Finalize manifest schema v1</li>
+<li>Finalize capability catalog v1</li>
+<li>Finalize plan hash canonicalization rules</li>
+</ul>
+
+<h3>Phase 1 — Framework shell MVP</h3>
+
+<ul>
+<li>Nexus shell UI</li>
+<li>Module discovery + manifest validation</li>
+<li>Settings host + module settings pages</li>
+<li>Command palette baseline</li>
+<li>Diagnostics baseline</li>
+</ul>
+
+<h3>Phase 2 — Plan Hub + engine</h3>
+
+<ul>
+<li>Plan object + hashing + approval</li>
+<li>Step model + risk</li>
+<li>Report pipeline</li>
+</ul>
+
+<h3>Phase 3 — AppSCrawler “ultimate core”</h3>
+
+<ul>
+<li>Providers: winget/choco/download/portable</li>
+<li>Add MSI + MSIX/Appx providers</li>
+<li>Inventory snapshots + diff</li>
+<li>Cache/offline + integrity</li>
+</ul>
+
+<h3>Phase 4 — Ultimate polish</h3>
+
+<ul>
+<li>Pop-out windows</li>
+<li>Trust Center + bundle import</li>
+<li>Scheduling Center</li>
+<li>Support bundle generator</li>
+<li>Performance profiling UI</li>
+</ul>
+
+<h3>Phase 5 — Productization (optional)</h3>
+
+<ul>
+<li>MSI/EXE packaging</li>
+<li>Service-backed execution</li>
+<li>Auto-update channels</li>
+</ul>
+
+<hr />
+
+<h2>16. Decision Locks (so future changes stay sane)</h2>
+
+<ul>
+<li>Product name: 47Project Framework</li>
+<li>Shell codename: Nexus</li>
+<li>Module manifest schema v1 is the contract</li>
+<li>Capability catalog v1 is the contract</li>
+<li>Plan hash canonicalization must remain stable once shipped</li>
+</ul>
+
+<hr />
+
+<h2>17. Appendix: File formats</h2>
+
+<h3>17.1 <code>.47plan</code></h3>
+
+<ul>
+<li>Canonical JSON plan + metadata + optional signature.</li>
+</ul>
+
+<h3>17.2 <code>.47module</code></h3>
+
+<ul>
+<li>Zip: module.json + assets/binaries + signature manifest.</li>
+</ul>
+
+<h3>17.3 <code>.47bundle</code></h3>
+
+<ul>
+<li>Offline distribution bundle with signed content manifest.</li>
+</ul>
+
+<hr />
+
+<h2>18. Appendix: UX checklists</h2>
+
+<ul>
+<li>Every module has its own Settings page.</li>
+<li>Every plan is previewable.</li>
+<li>Every run produces a report.</li>
+<li>Unsafe actions always labeled and gated.</li>
+<li>Diagnostics export is always one click.</li>
+</ul>
+
+</body>
+</html>

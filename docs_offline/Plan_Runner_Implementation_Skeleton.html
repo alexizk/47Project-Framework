@@ -1,0 +1,95 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Plan_Runner_Implementation_Skeleton.md</title>
+<style>
+body { font-family: system-ui, Segoe UI, Arial, sans-serif; margin: 2rem; line-height: 1.5; max-width: 1100px; }
+pre { white-space: pre-wrap; word-wrap: break-word; background: #f6f8fa; padding: 1rem; border-radius: 12px; }
+code { background: #f6f8fa; padding: 0.1rem 0.2rem; border-radius: 6px; }
+a { color: #0b57d0; }
+table { border-collapse: collapse; }
+td, th { border: 1px solid #ddd; padding: 6px 10px; }
+</style>
+</head>
+<body>
+<h1>Plan Runner Implementation Skeleton</h1>
+
+<p>This pack includes a <strong>working skeleton</strong> of the Plan Runner that is intended to be the final shape of the Framework runner, but with <strong>stub executors</strong> for step types.</p>
+
+<h2>Where the code lives</h2>
+
+<ul>
+<li><code>Framework/Core/PlanRunner/47.PlanRunner.psm1</code></li>
+<li>Exported through Core: <code>Framework/Core/47.Core.psm1</code></li>
+<li>CLI entrypoint:
+<ul>
+<li><code>./47.ps1 plan run &lt;planPath&gt; [whatif|apply] [policyPath] [nosnapshot] [continue]</code></li>
+<li>Tool wrapper: <code>tools/Run-47Plan.ps1</code></li>
+</ul></li>
+</ul>
+
+<h2>What is implemented (today)</h2>
+
+<ul>
+<li>Run context (<code>runId</code>, run folder, journal + result paths)</li>
+<li><code>journal.jsonl</code> append-only journal (start/end + per-step entries)</li>
+<li>Policy risk gating per step via <code>Test-47RiskAllowed</code></li>
+<li>Pre-run snapshot on <code>Apply</code> mode (unless <code>-NoSnapshot</code>)</li>
+<li>Default executor registration (stubs for common step types)</li>
+<li>A <code>WhatIf</code> mode that produces deterministic "would run" results</li>
+</ul>
+
+<h2>What is intentionally stubbed</h2>
+
+<p>The following step types are registered as <strong>stubs</strong> (WhatIf works, Apply throws):</p>
+
+<ul>
+<li><code>exec</code></li>
+<li><code>copy</code></li>
+<li><code>download</code></li>
+<li><code>registry</code></li>
+<li><code>env</code></li>
+<li><code>service</code></li>
+<li><code>task</code></li>
+<li><code>module.call</code></li>
+</ul>
+
+<h2>How to extend (the intended way)</h2>
+
+<p>Implement real executors and register them:</p>
+
+<ul>
+<li>Add executor scripts in: <code>Framework/Core/PlanRunner/Executors/</code></li>
+<li>Replace the default stub registration in <code>Register-47DefaultStepExecutors</code></li>
+<li>Each executor receives: <code>(context, plan, step, mode)</code> and returns a hashtable:
+<ul>
+<li><code>status</code>: <code>ok | whatif | skipped | blocked | error</code></li>
+<li><code>message</code> (optional)</li>
+<li><code>artifacts</code> (optional)</li>
+</ul></li>
+</ul>
+
+<h2>Output contract</h2>
+
+<p>A run writes:</p>
+
+<ul>
+<li><code>journal.jsonl</code> — append-only audit stream (one JSON object per line)</li>
+<li><code>result.json</code> — summarized run results</li>
+</ul>
+
+<p>Both paths are included in the returned object from <code>Invoke-47PlanRun</code>.</p>
+
+<h2>Next coding milestone</h2>
+
+<ol>
+<li>Implement the first real executor: <code>exec</code></li>
+<li>Add idempotency checks (step declares <code>ensure</code> / <code>check</code>)</li>
+<li>Implement <code>download</code> with trust verification + quarantine</li>
+<li>Add resume logic (continue from journal)</li>
+</ol>
+
+</body>
+</html>

@@ -1,0 +1,79 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>CLI_Conventions.md</title>
+<style>
+body { font-family: system-ui, Segoe UI, Arial, sans-serif; margin: 2rem; line-height: 1.5; max-width: 1100px; }
+pre { white-space: pre-wrap; word-wrap: break-word; background: #f6f8fa; padding: 1rem; border-radius: 12px; }
+code { background: #f6f8fa; padding: 0.1rem 0.2rem; border-radius: 6px; }
+a { color: #0b57d0; }
+table { border-collapse: collapse; }
+td, th { border: 1px solid #ddd; padding: 6px 10px; }
+</style>
+</head>
+<body>
+<h1>CLI Conventions</h1>
+
+<p>Even if the Nexus Shell is menu-based, we keep a stable CLI command surface.</p>
+
+<h2>Command prefix</h2>
+
+<ul>
+<li><code>47</code> is the primary CLI entrypoint (script shim).</li>
+</ul>
+
+<h2>Common commands</h2>
+
+<ul>
+<li><code>47 help</code></li>
+<li><code>47 version</code></li>
+<li><code>47 modules list</code></li>
+<li><code>47 modules import &lt;moduleId&gt;</code></li>
+<li><code>47 policy show</code></li>
+<li><code>47 plan validate &lt;path&gt;</code></li>
+<li><code>47 plan hash &lt;path&gt;</code></li>
+<li><code>47 doctor</code></li>
+<li><code>47 diag export</code></li>
+</ul>
+
+<h2>Output conventions</h2>
+
+<ul>
+<li>Human-readable by default.</li>
+<li><code>--json</code> for machine-readable output (planned).</li>
+<li>Exit codes:
+<ul>
+<li><code>0</code> success</li>
+<li><code>1</code> generic error</li>
+<li><code>2</code> validation failure</li>
+<li><code>3</code> policy denied</li>
+<li><code>4</code> trust/signature failure</li>
+</ul></li>
+</ul>
+
+<h2>Future flags</h2>
+
+<ul>
+<li><code>--portable</code></li>
+<li><code>--dataRoot &lt;path&gt;</code></li>
+</ul>
+
+<h2>Implemented commands (shim)</h2>
+
+<ul>
+<li><code>47.ps1 help</code></li>
+<li><code>47.ps1 doctor</code></li>
+<li><code>47.ps1 snapshot [name]</code> (creates a snapshot including the pack)</li>
+<li><code>47.ps1 snapshots</code> (lists snapshots)</li>
+<li><code>47.ps1 rollback</code> (restores the most recent snapshot user data)</li>
+<li><code>47.ps1 module new &lt;moduleId&gt;</code> (scaffolds a module)</li>
+<li><code>47.ps1 docs</code> (build offline docs)</li>
+<li><code>47.ps1 style</code> / <code>47.ps1 fixstyle</code></li>
+<li><code>47.ps1 release</code> (build release zip into <code>dist/</code>)</li>
+<li><code>47.ps1 update &lt;zipPath&gt; [targetRoot]</code> (safe stage + atomic swap)</li>
+</ul>
+
+</body>
+</html>

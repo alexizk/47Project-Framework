@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "createdAt": "2025-12-26T03:00:00Z",
+  "id": "plan.sample.exec.hello",
+  "description": "Sample exec plan that prints environment info.",
+  "steps": [
+    {
+      "stepId": "hello",
+      "type": "exec",
+      "risk": "safe",
+      "exec": {
+        "file": "pwsh",
+        "args": [
+          "-NoProfile",
+          "-NonInteractive",
+          "-Command",
+          "Write-Output 'Hello from 47 Plan Runner'; $PSVersionTable.PSVersion.ToString()"
+        ],
+        "timeoutSec": 60,
+        "captureMaxKB": 64
+      }
+    },
+    {
+      "stepId": "create-marker",
+      "type": "exec",
+      "risk": "safe",
+      "check": {
+        "type": "pathExists",
+        "path": "marker.txt"
+      },
+      "exec": {
+        "file": "pwsh",
+        "args": [
+          "-NoProfile",
+          "-NonInteractive",
+          "-Command",
+          "'done' | Set-Content -LiteralPath (Join-Path (Get-Location) 'marker.txt') -Encoding UTF8; Write-Output 'Marker created'"
+        ],
+        "cwd": ".",
+        "timeoutSec": 60
+      }
+    }
+  ]
+}

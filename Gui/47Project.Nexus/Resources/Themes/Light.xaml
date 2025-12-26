@@ -1,0 +1,9 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!-- Minimal base theme; expand later -->
+  <SolidColorBrush x:Key="App.Background" Color="#FFF7F7F7"/>
+  <SolidColorBrush x:Key="App.Surface" Color="#FFFFFFFF"/>
+  <SolidColorBrush x:Key="App.Text" Color="#FF111111"/>
+  <SolidColorBrush x:Key="App.SubtleText" Color="#FF444444"/>
+  <SolidColorBrush x:Key="App.Border" Color="#FFDDDDDD"/>
+</ResourceDictionary>

@@ -1,0 +1,21 @@
+    <!doctype html>
+    <html><head><meta charset="utf-8"/><title>Secure Module Author Guide</title></head>
+    <body>
+    <h1>Secure Module Author Guide</h1>
+    <pre style="white-space:pre-wrap;font-family:system-ui,Segoe UI,Arial"># Secure Module Author Guide
+
+## Rules
+- Never execute network calls unless the capability/policy allows it.
+- Never write secrets to logs. Use the redaction helpers.
+- Prefer idempotent operations (check desired state first).
+- Use `Invoke-47External` for processes (timeouts + capture + restricted-mode checks).
+- Validate inputs; treat plan JSON as untrusted.
+
+## Required exports
+- `Initialize`
+- `SelfTest`
+- `GetDoctorChecks` (optional)
+- `GetCommands` (optional)
+- `Invoke` (action dispatcher)
+</pre>
+    </body></html>

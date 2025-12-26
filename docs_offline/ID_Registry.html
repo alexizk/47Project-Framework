@@ -1,0 +1,64 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>ID_Registry.md</title>
+<style>
+body { font-family: system-ui, Segoe UI, Arial, sans-serif; margin: 2rem; line-height: 1.5; max-width: 1100px; }
+pre { white-space: pre-wrap; word-wrap: break-word; background: #f6f8fa; padding: 1rem; border-radius: 12px; }
+code { background: #f6f8fa; padding: 0.1rem 0.2rem; border-radius: 6px; }
+a { color: #0b57d0; }
+table { border-collapse: collapse; }
+td, th { border: 1px solid #ddd; padding: 6px 10px; }
+</style>
+</head>
+<body>
+<h1>ID Registry</h1>
+
+<p>A single place to prevent ID collisions and enforce naming conventions.</p>
+
+<h2>Prefixes (reserved)</h2>
+
+<ul>
+<li>Modules: <code>mod.&lt;domain&gt;.&lt;name&gt;</code></li>
+<li>Capabilities: <code>cap.&lt;domain&gt;.&lt;action&gt;</code></li>
+<li>Policies: <code>policy.&lt;scope&gt;.&lt;name&gt;</code></li>
+<li>Plans: <code>plan.&lt;domain&gt;.&lt;name&gt;</code></li>
+<li>Bundles: <code>bundle.&lt;domain&gt;.&lt;name&gt;</code></li>
+<li>Repositories: <code>repo.&lt;domain&gt;.&lt;name&gt;</code></li>
+</ul>
+
+<h2>Rules</h2>
+
+<ol>
+<li>IDs are <strong>lowercase</strong> and use <strong>dot notation</strong>.</li>
+<li>No spaces. No underscores.</li>
+<li>Once published, an ID is <strong>never reused</strong> for a different meaning.</li>
+<li>Renames require a deprecation alias for at least <strong>one MINOR</strong> framework release.</li>
+</ol>
+
+<h2>Current assignments</h2>
+
+<h3>Modules</h3>
+
+<ul>
+<li><code>mod.framework.appcrawler</code></li>
+<li><code>mod.framework.identitykit</code></li>
+<li><code>mod.framework.hellomodule</code></li>
+</ul>
+
+<h3>Capabilities</h3>
+
+<p>See <code>schemas/Capability_Catalog_v1.json</code>.</p>
+
+<h2>How to add a new ID</h2>
+
+<ol>
+<li>Add it here under the correct section.</li>
+<li>Add the matching schema/catalog entry if applicable.</li>
+<li>Add a test in <code>tests/Schema.Tests.ps1</code> that validates the updated file(s).</li>
+</ol>
+
+</body>
+</html>

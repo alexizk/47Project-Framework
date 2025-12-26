@@ -1,0 +1,17 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "plan.sample.modulecall",
+  "displayName": "Sample Module Call Plan",
+  "risk": "safe",
+  "steps": [
+    {
+      "type": "module.call",
+      "stepId": "systeminfo_summary",
+      "moduleCall": {
+        "moduleId": "mod.systeminfo",
+        "action": "summary",
+        "args": {}
+      }
+    }
+  ]
+}

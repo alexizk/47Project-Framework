@@ -1,0 +1,9 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://47project/schemas/string_table_v1.schema.json",
+  "title": "47Project String Table v1",
+  "type": "object",
+  "additionalProperties": {
+    "type": "string"
+  }
+}

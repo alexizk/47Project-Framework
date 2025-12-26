@@ -1,0 +1,39 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Doctor_Extensibility.md</title>
+<style>
+body { font-family: system-ui, Segoe UI, Arial, sans-serif; margin: 2rem; line-height: 1.5; max-width: 1100px; }
+pre { white-space: pre-wrap; word-wrap: break-word; background: #f6f8fa; padding: 1rem; border-radius: 12px; }
+code { background: #f6f8fa; padding: 0.1rem 0.2rem; border-radius: 6px; }
+a { color: #0b57d0; }
+table { border-collapse: collapse; }
+td, th { border: 1px solid #ddd; padding: 6px 10px; }
+</style>
+</head>
+<body>
+<h1>Doctor Extensibility</h1>
+
+<p>Date: 2025-12-26</p>
+
+<h2>Goal</h2>
+
+<p>Let modules contribute health checks so <code>47 doctor</code> scales with the ecosystem.</p>
+
+<h2>Contract</h2>
+
+<p>Modules may export <code>Get-47DoctorChecks</code> returning an array of checks:
+- <code>id</code>, <code>name</code>, <code>severity</code>, <code>run</code> (scriptblock), <code>helpUrl</code> (optional)</p>
+
+<p>Framework runs checks and outputs:
+- human-readable summary
+- optional <code>--json</code> structured output</p>
+
+<h2>Safety</h2>
+
+<p>Doctor checks should be read-only by default.</p>
+
+</body>
+</html>

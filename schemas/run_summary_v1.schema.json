@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://47project.local/schemas/run_summary_v1.schema.json",
+  "title": "47Project Run Summary (v1)",
+  "type": "object",
+  "required": [
+    "runId",
+    "planId",
+    "startedAt",
+    "endedAt",
+    "journalPath",
+    "status"
+  ],
+  "properties": {
+    "runId": {
+      "type": "string"
+    },
+    "planId": {
+      "type": "string"
+    },
+    "startedAt": {
+      "type": "string"
+    },
+    "endedAt": {
+      "type": "string"
+    },
+    "journalPath": {
+      "type": "string"
+    },
+    "snapshotId": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "status": {
+      "type": "string"
+    },
+    "frameworkVersion": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  },
+  "additionalProperties": true
+}

@@ -1,0 +1,43 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Repo_Channels.md</title>
+<style>
+body { font-family: system-ui, Segoe UI, Arial, sans-serif; margin: 2rem; line-height: 1.5; max-width: 1100px; }
+pre { white-space: pre-wrap; word-wrap: break-word; background: #f6f8fa; padding: 1rem; border-radius: 12px; }
+code { background: #f6f8fa; padding: 0.1rem 0.2rem; border-radius: 6px; }
+a { color: #0b57d0; }
+table { border-collapse: collapse; }
+td, th { border: 1px solid #ddd; padding: 6px 10px; }
+</style>
+</head>
+<body>
+<h1>Repository Channels</h1>
+
+<p>Repositories can be split into channels:</p>
+
+<ul>
+<li><code>stable</code></li>
+<li><code>beta</code></li>
+<li><code>nightly</code></li>
+</ul>
+
+<h2>Layout</h2>
+
+<ul>
+<li><code>repositories/&lt;repo&gt;/channels/&lt;channel&gt;/packages/&lt;packageId&gt;/&lt;version&gt;/...</code></li>
+<li><code>repositories/&lt;repo&gt;/channels/&lt;channel&gt;/index.json</code></li>
+</ul>
+
+<p>A root <code>repositories/&lt;repo&gt;/index.json</code> can contain a <code>channels</code> section that mirrors each channel’s package list.</p>
+
+<h2>Generate</h2>
+
+<ul>
+<li><code>pwsh -File .\tools\Generate-47RepoIndex.ps1 -RepoRoot .\repositories\local -Channel stable</code></li>
+</ul>
+
+</body>
+</html>

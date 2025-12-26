@@ -1,0 +1,533 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://47project/schemas/plan_v1.schema.json",
+  "title": "47Project Plan v1",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "hashSpecVersion",
+    "createdAt",
+    "frameworkVersion",
+    "moduleId",
+    "action",
+    "targets",
+    "steps",
+    "planHash"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "type": "integer",
+      "const": 1
+    },
+    "hashSpecVersion": {
+      "type": "integer",
+      "const": 1
+    },
+    "createdAt": {
+      "type": "string"
+    },
+    "frameworkVersion": {
+      "type": "string"
+    },
+    "moduleId": {
+      "type": "string"
+    },
+    "action": {
+      "type": "string"
+    },
+    "targets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "provider"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "provider": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "policySnapshot": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "steps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "stepId",
+          "type"
+        ],
+        "properties": {
+          "stepId": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "risk": {
+            "type": "string"
+          },
+          "preview": {
+            "type": "string"
+          },
+          "timeoutSec": {
+            "type": "integer"
+          },
+          "id": {
+            "type": "string",
+            "description": "Alias for stepId (legacy)."
+          },
+          "exec": {
+            "type": "object",
+            "description": "Exec step payload (required when type=='exec')",
+            "properties": {
+              "file": {
+                "type": "string"
+              },
+              "args": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "cwd": {
+                "type": "string"
+              },
+              "env": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": [
+                    "string",
+                    "number",
+                    "boolean",
+                    "null"
+                  ]
+                }
+              },
+              "timeoutSec": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "okExitCodes": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                }
+              },
+              "captureMaxKB": {
+                "type": "integer",
+                "minimum": 1
+              }
+            },
+            "required": [
+              "file"
+            ],
+            "additionalProperties": true
+          },
+          "check": {
+            "type": "object",
+            "description": "Idempotency check. Supported types: pathExists, exec (exec steps), fileHashEquals (download steps).",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "pathExists",
+                  "exec"
+                ]
+              },
+              "path": {
+                "type": "string"
+              },
+              "exec": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string"
+                  },
+                  "args": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "cwd": {
+                    "type": "string"
+                  },
+                  "timeoutSec": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "expectExitCode": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "file"
+                ],
+                "additionalProperties": true
+              },
+              "sha256": {
+                "type": "string",
+                "pattern": "^[A-Fa-f0-9]{64}$"
+              }
+            },
+            "required": [
+              "type"
+            ],
+            "additionalProperties": true,
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "type": {
+                      "const": "pathExists"
+                    }
+                  }
+                },
+                "then": {
+                  "required": [
+                    "path"
+                  ]
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "type": {
+                      "const": "exec"
+                    }
+                  }
+                },
+                "then": {
+                  "required": [
+                    "exec"
+                  ]
+                }
+              }
+            ]
+          },
+          "download": {
+            "type": "object",
+            "description": "Download step payload (required when type=='download')",
+            "properties": {
+              "url": {
+                "type": "string",
+                "description": "Remote URL or local path to download/copy."
+              },
+              "dest": {
+                "type": "string",
+                "description": "Destination file path (absolute or relative to plan directory). If omitted, stored under run artifacts."
+              },
+              "sha256": {
+                "type": "string",
+                "description": "Expected SHA256 (hex). If provided, download is verified.",
+                "pattern": "^[A-Fa-f0-9]{64}$"
+              },
+              "headers": {
+                "type": "object",
+                "description": "Optional HTTP headers.",
+                "additionalProperties": {
+                  "type": [
+                    "string",
+                    "number",
+                    "boolean",
+                    "null"
+                  ]
+                }
+              },
+              "timeoutSec": {
+                "type": "integer",
+                "minimum": 1,
+                "description": "HTTP timeout seconds (remote only)."
+              },
+              "useCache": {
+                "type": "boolean",
+                "description": "Use per-user cache for downloads (default true)."
+              },
+              "overwrite": {
+                "type": "boolean",
+                "description": "Overwrite destination if it exists (default false)."
+              },
+              "extract": {
+                "type": "boolean",
+                "description": "If true, treat downloaded file as a ZIP and extract safely (zip-slip protected)."
+              },
+              "extractTo": {
+                "type": "string",
+                "description": "Destination directory for extraction (required when extract=true)."
+              }
+            },
+            "required": [
+              "url"
+            ],
+            "additionalProperties": true
+          },
+          "copy": {
+            "type": "object",
+            "required": [
+              "source",
+              "destination"
+            ],
+            "properties": {
+              "ensure": {
+                "type": "string",
+                "enum": [
+                  "present",
+                  "absent"
+                ]
+              },
+              "source": {
+                "type": "string"
+              },
+              "destination": {
+                "type": "string"
+              },
+              "overwrite": {
+                "type": "boolean"
+              },
+              "recurse": {
+                "type": "boolean"
+              },
+              "skipIfSameHash": {
+                "type": "boolean"
+              }
+            },
+            "additionalProperties": true
+          },
+          "registry": {
+            "type": "object",
+            "required": [
+              "hive",
+              "path",
+              "action"
+            ],
+            "properties": {
+              "hive": {
+                "type": "string"
+              },
+              "path": {
+                "type": "string"
+              },
+              "action": {
+                "type": "string",
+                "enum": [
+                  "setValue",
+                  "removeValue",
+                  "ensureKey",
+                  "removeKey"
+                ]
+              },
+              "name": {
+                "type": "string"
+              },
+              "valueType": {
+                "type": "string"
+              },
+              "value": {}
+            },
+            "additionalProperties": true
+          },
+          "moduleCall": {
+            "type": "object",
+            "required": [
+              "moduleId",
+              "action"
+            ],
+            "properties": {
+              "moduleId": {
+                "type": "string"
+              },
+              "action": {
+                "type": "string"
+              },
+              "args": {
+                "type": "object"
+              }
+            },
+            "additionalProperties": true
+          },
+          "env": {
+            "type": "object",
+            "description": "Environment variable operations.",
+            "additionalProperties": true
+          },
+          "service": {
+            "type": "object",
+            "description": "Windows service operations.",
+            "additionalProperties": true
+          },
+          "task": {
+            "type": "object",
+            "description": "Scheduled task operations (Windows).",
+            "additionalProperties": true
+          },
+          "fileEnsure": {
+            "type": "object",
+            "description": "Ensure file content/state.",
+            "additionalProperties": true
+          },
+          "dirEnsure": {
+            "type": "object",
+            "description": "Ensure directory state.",
+            "additionalProperties": true
+          },
+          "zipExtract": {
+            "type": "object",
+            "description": "Extract zip safely.",
+            "additionalProperties": true
+          },
+          "jsonMerge": {
+            "type": "object",
+            "description": "Merge JSON into an existing JSON file.",
+            "additionalProperties": true
+          },
+          "jsonPatch": {
+            "type": "object",
+            "description": "Apply JSON patch operations.",
+            "additionalProperties": true
+          },
+          "hosts": {
+            "type": "object",
+            "description": "Hosts file edits (Windows).",
+            "additionalProperties": true
+          },
+          "winget": {
+            "type": "object",
+            "description": "winget operations (Windows).",
+            "additionalProperties": true
+          },
+          "choco": {
+            "type": "object",
+            "description": "Chocolatey operations (Windows).",
+            "additionalProperties": true
+          },
+          "gitClone": {
+            "type": "object",
+            "description": "Git clone operations.",
+            "additionalProperties": true
+          },
+          "moduleInstall": {
+            "type": "object",
+            "description": "Install a module artifact.",
+            "additionalProperties": true
+          },
+          "moduleUninstall": {
+            "type": "object",
+            "description": "Uninstall a module.",
+            "additionalProperties": true
+          },
+          "capability": {
+            "type": "string",
+            "description": "Capability id required for this step."
+          }
+        },
+        "additionalProperties": true,
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "type": {
+                  "const": "exec"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "exec"
+              ]
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "type": {
+                  "const": "copy"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "copy"
+              ]
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "type": {
+                  "const": "registry"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "registry"
+              ]
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "type": {
+                  "const": "module.call"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "moduleCall"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "planHash": {
+      "type": "string"
+    },
+    "signature": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "properties": {
+        "alg": {
+          "type": "string"
+        },
+        "kid": {
+          "type": "string"
+        },
+        "sig": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": true
+    },
+    "include": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of plan paths to include (steps appended before current)."
+    },
+    "extends": {
+      "type": "string",
+      "description": "Base plan path to extend/merge."
+    },
+    "outputs": {
+      "type": "object",
+      "description": "Optional output bindings.",
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

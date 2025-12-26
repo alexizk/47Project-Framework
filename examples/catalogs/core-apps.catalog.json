@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "catalogId": "core-apps",
+  "apps": [
+    {
+      "id": "7zip",
+      "name": "7-Zip",
+      "provider": "winget",
+      "packageId": "7zip.7zip",
+      "tags": [
+        "compression",
+        "utility"
+      ]
+    },
+    {
+      "id": "vscode",
+      "name": "Visual Studio Code",
+      "provider": "winget",
+      "packageId": "Microsoft.VisualStudioCode",
+      "tags": [
+        "dev",
+        "editor"
+      ]
+    },
+    {
+      "id": "git",
+      "name": "Git",
+      "provider": "winget",
+      "packageId": "Git.Git",
+      "tags": [
+        "dev",
+        "vcs"
+      ]
+    },
+    {
+      "id": "chrome",
+      "name": "Google Chrome",
+      "provider": "winget",
+      "packageId": "Google.Chrome",
+      "tags": [
+        "browser"
+      ]
+    }
+  ]
+}

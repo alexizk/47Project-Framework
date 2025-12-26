@@ -1,0 +1,160 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://47project/schemas/repo_index_v1.schema.json",
+  "title": "47 Repository Index (v1)",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "repositoryId",
+    "displayName",
+    "updatedAt"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "type": "string"
+    },
+    "repositoryId": {
+      "type": "string"
+    },
+    "displayName": {
+      "type": "string"
+    },
+    "updatedAt": {
+      "type": "string"
+    },
+    "packages": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/package"
+      },
+      "default": []
+    },
+    "channels": {
+      "type": "object",
+      "properties": {
+        "stable": {
+          "$ref": "#/definitions/channel"
+        },
+        "beta": {
+          "$ref": "#/definitions/channel"
+        },
+        "nightly": {
+          "$ref": "#/definitions/channel"
+        }
+      },
+      "additionalProperties": false
+    },
+    "signature": {
+      "type": "object",
+      "required": [
+        "alg",
+        "sig"
+      ],
+      "properties": {
+        "alg": {
+          "type": "string"
+        },
+        "kid": {
+          "type": "string"
+        },
+        "sig": {
+          "type": "string"
+        },
+        "signedAt": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": true
+    },
+    "channel": {
+      "type": "string"
+    }
+  },
+  "anyOf": [
+    {
+      "required": [
+        "packages"
+      ]
+    },
+    {
+      "required": [
+        "channels"
+      ]
+    }
+  ],
+  "definitions": {
+    "channel": {
+      "type": "object",
+      "required": [
+        "updatedAt",
+        "packages"
+      ],
+      "properties": {
+        "updatedAt": {
+          "type": "string"
+        },
+        "packages": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/package"
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "package": {
+      "type": "object",
+      "required": [
+        "packageId",
+        "version",
+        "updatedAt",
+        "files"
+      ],
+      "properties": {
+        "packageId": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "string"
+        },
+        "channel": {
+          "type": "string",
+          "enum": [
+            "stable",
+            "beta",
+            "nightly"
+          ]
+        },
+        "files": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "path",
+              "sha256"
+            ],
+            "properties": {
+              "path": {
+                "type": "string"
+              },
+              "sha256": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              "size": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "additionalProperties": true
+          }
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

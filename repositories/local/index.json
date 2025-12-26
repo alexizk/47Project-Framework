@@ -1,0 +1,20 @@
+{
+  "schemaVersion": "1.0.0",
+  "repositoryId": "repo.local.default",
+  "displayName": "Local Repo (Default)",
+  "updatedAt": "2025-12-26T01:45:34Z",
+  "channels": {
+    "stable": {
+      "updatedAt": "2025-12-26T01:45:34Z",
+      "packages": []
+    },
+    "beta": {
+      "updatedAt": "2025-12-26T01:45:34Z",
+      "packages": []
+    },
+    "nightly": {
+      "updatedAt": "2025-12-26T01:45:34Z",
+      "packages": []
+    }
+  }
+}

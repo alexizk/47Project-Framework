@@ -1,0 +1,30 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Repo_Sync.md</title>
+<style>
+body { font-family: system-ui, Segoe UI, Arial, sans-serif; margin: 2rem; line-height: 1.5; max-width: 1100px; }
+pre { background: #111; color: #eee; padding: 1rem; overflow-x: auto; border-radius: 10px; }
+code { background: rgba(0,0,0,0.06); padding: 0.1rem 0.25rem; border-radius: 6px; }
+a { color: #0b74de; }
+</style>
+</head>
+<body>
+<h1>Repository sync and signed indexes</h1>
+<p>A repository is represented by an <code>index.json</code> file (optionally signed) plus package files referenced by relative paths in the index.</p>
+<h2>Sync (offline or HTTP)</h2>
+<pre><code>pwsh -File .\47.ps1 repo sync .\repositories\local\channels\stable\index.json</code></pre>
+<p>From a URL:</p>
+<pre><code>pwsh -File .\47.ps1 repo sync https://example.com/repo/stable/index.json</code></pre>
+<h2>Signature verification</h2>
+<p>If <code>index.json</code> contains a <code>signature</code> block, you must provide a certificate:</p>
+<pre><code>pwsh -File .\tools\Verify-47RepoIndex.ps1 -IndexPath .\index.json -CertPath .\publisher.cer</code></pre>
+<p>Or during sync:</p>
+<pre><code>pwsh -File .\47.ps1 repo sync https://example.com/repo/stable/index.json .\repositories\local .\publisher.cer</code></pre>
+<p>Unsigned indexes are rejected unless you pass <code>allowUnsigned</code>.</p>
+<h2>Signing</h2>
+<pre><code>pwsh -File .\tools\Sign-47RepoIndex.ps1 -IndexPath .\index.json -PfxPath .\publisher.pfx</code></pre>
+</body>
+</html>

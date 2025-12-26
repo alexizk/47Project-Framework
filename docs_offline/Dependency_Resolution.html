@@ -1,0 +1,16 @@
+    <!doctype html>
+    <html><head><meta charset="utf-8"/><title>Dependency Resolution</title></head>
+    <body>
+    <h1>Dependency Resolution</h1>
+    <pre style="white-space:pre-wrap;font-family:system-ui,Segoe UI,Arial"># Dependency Resolution
+
+Modules may declare:
+- `dependsOn`: list of module IDs with version constraints
+- `minApiLevel`: required framework/module API level
+
+Resolution rules:
+- Prefer already-installed modules satisfying constraints
+- Otherwise install from repo (policy + trust required)
+- Detect cycles and fail validation
+</pre>
+    </body></html>

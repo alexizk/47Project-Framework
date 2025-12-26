@@ -1,0 +1,18 @@
+{
+  "schemaVersion": "1.0.0",
+  "apiLevel": 1,
+  "moduleId": "mod.systeminfo",
+  "displayName": "System Info",
+  "version": "0.1.0",
+  "author": "47Project",
+  "description": "Collects basic system information for diagnostics.",
+  "entrypoint": "module.psm1",
+  "risk": "safe",
+  "capabilities": [
+    "cap.systeminfo.read"
+  ],
+  "supportedPlatforms": [
+    "windows"
+  ],
+  "minPowerShellVersion": "5.1"
+}

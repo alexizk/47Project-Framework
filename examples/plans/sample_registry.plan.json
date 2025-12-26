@@ -1,0 +1,29 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "plan.sample.registry",
+  "displayName": "Sample Registry Plan (HKCU)",
+  "risk": "unsafe_requires_explicit_policy",
+  "steps": [
+    {
+      "type": "registry",
+      "stepId": "ensure_key",
+      "registry": {
+        "hive": "HKCU",
+        "path": "Software\\\\47Project",
+        "action": "ensureKey"
+      }
+    },
+    {
+      "type": "registry",
+      "stepId": "set_value",
+      "registry": {
+        "hive": "HKCU",
+        "path": "Software\\\\47Project",
+        "action": "setValue",
+        "name": "Enabled",
+        "valueType": "DWord",
+        "value": 1
+      }
+    }
+  ]
+}

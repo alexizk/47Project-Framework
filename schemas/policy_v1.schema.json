@@ -1,0 +1,129 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://47project/schemas/policy_v1.schema.json",
+  "title": "47Project Policy v1",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "allowUnsafe",
+    "capabilityGrants"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "type": "integer",
+      "const": 1
+    },
+    "allowUnsafe": {
+      "type": "boolean"
+    },
+    "capabilityGrants": {
+      "type": "object",
+      "required": [
+        "global",
+        "modules"
+      ],
+      "properties": {
+        "global": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "modules": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "ui": {
+      "type": "object",
+      "properties": {
+        "warnOnUnsafe": {
+          "type": "boolean"
+        },
+        "showAdvancedByDefault": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": true
+    },
+    "unsafeGates": {
+      "type": "object",
+      "description": "Fine-grained unsafe gates by category.",
+      "properties": {
+        "unsafe_requires_admin": {
+          "type": "boolean"
+        },
+        "unsafe_requires_explicit_policy": {
+          "type": "boolean"
+        },
+        "blocked": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "restrictedMode": {
+      "type": "object",
+      "description": "Optional safety restrictions beyond capability grants.",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": false
+        },
+        "blockExternalExec": {
+          "type": "boolean",
+          "default": false
+        },
+        "blockNetwork": {
+          "type": "boolean",
+          "default": false
+        },
+        "blockRegistryWrites": {
+          "type": "boolean",
+          "default": false
+        },
+        "blockUnsignedModules": {
+          "type": "boolean",
+          "default": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "prompting": {
+      "type": "object",
+      "properties": {
+        "allowInteractivePrompts": {
+          "type": "boolean",
+          "default": true
+        },
+        "allowSecretPrompts": {
+          "type": "boolean",
+          "default": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "nonInteractive": {
+      "type": "object",
+      "properties": {
+        "onPrompt": {
+          "type": "string",
+          "enum": [
+            "deny",
+            "fail"
+          ],
+          "default": "deny"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": true
+}

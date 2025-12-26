@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "allowUnsafe": false,
+  "capabilityGrants": {
+    "global": [
+      "cap.policy.read",
+      "cap.logs.write"
+    ],
+    "modules": {
+      "HelloModule": [
+        "cap.logs.write"
+      ]
+    }
+  },
+  "ui": {
+    "warnOnUnsafe": true,
+    "showAdvancedByDefault": false
+  },
+  "notes": "Locked down profile for troubleshooting. App install/updates disabled."
+}

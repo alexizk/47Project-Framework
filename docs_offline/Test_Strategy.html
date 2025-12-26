@@ -1,0 +1,61 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Test_Strategy.md</title>
+<style>
+body { font-family: system-ui, Segoe UI, Arial, sans-serif; margin: 2rem; line-height: 1.5; max-width: 1100px; }
+pre { white-space: pre-wrap; word-wrap: break-word; background: #f6f8fa; padding: 1rem; border-radius: 12px; }
+code { background: #f6f8fa; padding: 0.1rem 0.2rem; border-radius: 6px; }
+a { color: #0b57d0; }
+table { border-collapse: collapse; }
+td, th { border: 1px solid #ddd; padding: 6px 10px; }
+</style>
+</head>
+<body>
+<h1>Test Strategy</h1>
+
+<p>Date: 2025-12-26</p>
+
+<h2>Layers</h2>
+
+<ol>
+<li><strong>Unit tests</strong> (Pester): pure functions, schemas, canonical JSON, hashing</li>
+<li><strong>Integration tests</strong> (Pester): temp filesystem, local repo index, module loader</li>
+<li><strong>Security tests</strong>:
+<ul>
+<li>zip-slip/path traversal (safe extraction)</li>
+<li>signature failure paths</li>
+<li>policy denied paths</li>
+</ul></li>
+<li><strong>Golden tests</strong>:
+<ul>
+<li>canonical JSON and hashes stable across runs</li>
+</ul></li>
+</ol>
+
+<h2>CI expectations</h2>
+
+<ul>
+<li>Run unit tests on every push/PR</li>
+<li>Run integration tests on main (or nightly)</li>
+<li>Optional gates: coverage, analyzer warnings</li>
+</ul>
+
+<h2>Fixture rules</h2>
+
+<ul>
+<li>Tests must not mutate the host system (no registry/service changes outside mocks).</li>
+</ul>
+
+<h2>Security scan</h2>
+
+<p>CI runs <code>tools/Invoke-47SecurityScan.ps1</code> (lightweight secret pattern scan). For deeper scanning, integrate external tools (gitleaks/trufflehog) later.</p>
+
+<h2>Benchmarks</h2>
+
+<p>Benchmarks live under <code>tests/bench/</code> and are run manually (not in CI) using <code>tools/Invoke-47Bench.ps1</code>.</p>
+
+</body>
+</html>

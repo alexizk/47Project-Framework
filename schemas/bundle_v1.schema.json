@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://47project/schemas/bundle_v1.schema.json",
+  "title": "47Project Offline Bundle Manifest v1",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "bundleId",
+    "createdUtc",
+    "planHash",
+    "payload"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "type": "integer",
+      "const": 1
+    },
+    "bundleId": {
+      "type": "string"
+    },
+    "createdUtc": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "planHash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "payload": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "path",
+          "bytes"
+        ],
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "bytes": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "signature": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

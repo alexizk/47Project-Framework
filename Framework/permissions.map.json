@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "updatedAt": "2025-12-26T03:56:20Z",
+  "map": {
+    "exec": {
+      "capability": "cap.exec.process",
+      "reason": "Run external processes"
+    },
+    "download": {
+      "capability": "cap.network.access",
+      "reason": "Download remote content"
+    },
+    "copy": {
+      "capability": "cap.file.write",
+      "reason": "Write/modify files"
+    },
+    "registry": {
+      "capability": "cap.registry.write",
+      "reason": "Modify Windows registry"
+    },
+    "env": {
+      "capability": "cap.env.write",
+      "reason": "Modify environment variables"
+    },
+    "service": {
+      "capability": "cap.service.manage",
+      "reason": "Manage Windows services"
+    },
+    "task": {
+      "capability": "cap.task.manage",
+      "reason": "Manage scheduled tasks"
+    },
+    "file.ensure": {
+      "capability": "cap.file.write",
+      "reason": "Ensure file content/state"
+    },
+    "dir.ensure": {
+      "capability": "cap.file.write",
+      "reason": "Ensure directory state"
+    },
+    "zip.extract": {
+      "capability": "cap.zip.extract",
+      "reason": "Extract archives"
+    },
+    "json.merge": {
+      "capability": "cap.json.modify",
+      "reason": "Modify JSON files"
+    },
+    "json.patch": {
+      "capability": "cap.json.modify",
+      "reason": "Modify JSON files"
+    },
+    "module.call": {
+      "capability": "cap.module.call",
+      "reason": "Invoke module actions"
+    },
+    "module.install": {
+      "capability": "cap.module.install",
+      "reason": "Install/uninstall modules"
+    }
+  }
+}

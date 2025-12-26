@@ -1,0 +1,65 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Updater_Spec.md</title>
+<style>
+body { font-family: system-ui, Segoe UI, Arial, sans-serif; margin: 2rem; line-height: 1.5; max-width: 1100px; }
+pre { white-space: pre-wrap; word-wrap: break-word; background: #f6f8fa; padding: 1rem; border-radius: 12px; }
+code { background: #f6f8fa; padding: 0.1rem 0.2rem; border-radius: 6px; }
+a { color: #0b57d0; }
+table { border-collapse: collapse; }
+td, th { border: 1px solid #ddd; padding: 6px 10px; }
+</style>
+</head>
+<body>
+<h1>Updater Spec (v1)</h1>
+
+<p>The framework can update itself from a local zip or a trusted repository.</p>
+
+<h2>Update sources</h2>
+
+<ul>
+<li>Local zip (<code>.zip</code>)</li>
+<li>Local repository folder (<code>repositories/&lt;name&gt;</code>)</li>
+<li>Future: remote HTTP repository (same index format)</li>
+</ul>
+
+<h2>Requirements</h2>
+
+<ol>
+<li>Verify the package/bundle hash.</li>
+<li>If signed, verify signature against trust policy.</li>
+<li>Perform an atomic swap:
+<ul>
+<li>extract to temp</li>
+<li>verify structure</li>
+<li>swap folder</li>
+</ul></li>
+<li>Preserve user data (AppData/ProgramData) unless explicitly requested.</li>
+</ol>
+
+<h2>Rollback</h2>
+
+<ul>
+<li>Keep <code>previous/</code> copy for one rollback.</li>
+<li><code>47 update rollback</code> (planned)</li>
+</ul>
+
+<h2>Policy gates</h2>
+
+<ul>
+<li>Updates are blocked if trust verification fails, unless explicit policy permits unsigned updates.</li>
+</ul>
+
+<h2>Safety</h2>
+
+<ul>
+<li>Use safe zip extraction (zip-slip protection)</li>
+<li>Create a pre-update snapshot (includes pack) for rollback</li>
+<li>Apply via atomic swap (move old aside, move new into place)</li>
+</ul>
+
+</body>
+</html>

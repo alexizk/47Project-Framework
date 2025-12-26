@@ -1,0 +1,80 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Compatibility.md</title>
+<style>
+body { font-family: system-ui, Segoe UI, Arial, sans-serif; margin: 2rem; line-height: 1.5; max-width: 1100px; }
+pre { white-space: pre-wrap; word-wrap: break-word; background: #f6f8fa; padding: 1rem; border-radius: 12px; }
+code { background: #f6f8fa; padding: 0.1rem 0.2rem; border-radius: 6px; }
+a { color: #0b57d0; }
+table { border-collapse: collapse; }
+td, th { border: 1px solid #ddd; padding: 6px 10px; }
+</style>
+</head>
+<body>
+<h1>Compatibility</h1>
+
+<p>This document defines versioning and compatibility rules for <strong>47Project Framework</strong>.</p>
+
+<h2>Versioning</h2>
+
+<p>We use <strong>SemVer</strong> (MAJOR.MINOR.PATCH) for each independently-versioned surface:</p>
+
+<ul>
+<li><strong>Framework runtime</strong>: <code>frameworkVersion</code> (SemVer)</li>
+<li><strong>Schemas</strong>: <code>schemaVersion</code> (SemVer or <code>vN</code> depending on file; schema files include their own <code>$id</code>)</li>
+<li><strong>Module packages</strong>: <code>module.version</code> (SemVer)</li>
+<li><strong>Module API Level</strong>: <code>module.apiLevel</code> (integer, monotonic)</li>
+<li><strong>Plans</strong>: <code>plan.schemaVersion</code> + <code>plan.hashSpecVersion</code> (SemVer)</li>
+<li><strong>Bundles</strong>: <code>bundle.schemaVersion</code> (SemVer)</li>
+</ul>
+
+<h3>What counts as breaking?</h3>
+
+<ul>
+<li>Framework <strong>MAJOR</strong>: breaking changes in CLI, module loading, policy enforcement, trust model, storage layout, or schema compatibility.</li>
+<li>Schema <strong>MAJOR</strong>: a plan/module/policy/bundle JSON that validated before may fail after.</li>
+<li>Module <strong>MAJOR</strong>: breaking behavior or settings changes.</li>
+</ul>
+
+<h2>Compatibility guarantees</h2>
+
+<h3>Framework ↔ Schemas</h3>
+
+<ul>
+<li>Framework supports <strong>a range</strong> of schema versions per file type (plan/module/policy/bundle).</li>
+<li>The supported ranges are published in <code>schemas/README.md</code> and in <code>Framework/README.md</code>.</li>
+</ul>
+
+<h3>Framework ↔ Modules</h3>
+
+<p>A module is compatible if:
+- <code>module.apiLevel</code> is within the framework’s supported API range.
+- <code>minPowerShellVersion</code> (if present) is satisfied.
+- <code>supportedPlatforms</code> (if present) matches the host platform.</p>
+
+<h3>Plans</h3>
+
+<p>A plan is runnable if:
+- It validates against <code>schemas/plan_v1.schema.json</code> (or newer supported schema).
+- Its <code>planHash</code> matches the computed value for the declared <code>hashSpecVersion</code>.
+- If signed, <code>signature</code> verifies under the configured trust policy.</p>
+
+<h2>Deprecation policy</h2>
+
+<ul>
+<li>Deprecations are announced in <strong>MINOR</strong> releases.</li>
+<li>Removals happen only in <strong>MAJOR</strong> releases.</li>
+</ul>
+
+<h2>Compatibility quick reference</h2>
+
+<ul>
+<li><strong>Aim:</strong> Framework supports the last <strong>2 MAJOR</strong> schema versions per file type.</li>
+<li><strong>Modules:</strong> Framework supports API levels <strong>N-1 .. N</strong> (current and previous).</li>
+</ul>
+
+</body>
+</html>

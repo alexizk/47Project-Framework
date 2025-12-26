@@ -1,0 +1,7 @@
+{
+  "files.eol": "\n",
+  "editor.formatOnSave": true,
+  "powershell.codeFormatting.preset": "OTBS",
+  "powershell.integratedConsole.showOnStartup": false,
+  "powershell.scriptAnalysis.enable": true
+}

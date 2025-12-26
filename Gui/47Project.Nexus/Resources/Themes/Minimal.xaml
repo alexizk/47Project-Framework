@@ -1,0 +1,28 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <!-- Minimal theme: clean + restrained (dark-leaning), no grid, subtle accent -->
+  <Color x:Key="C.Bg">#FF0A0D0C</Color>
+  <Color x:Key="C.Surface">#FF101514</Color>
+  <Color x:Key="C.Surface2">#FF141B19</Color>
+  <Color x:Key="C.Border">#FF1E2A25</Color>
+  <Color x:Key="C.Text">#FFEAF6EE</Color>
+  <Color x:Key="C.SubtleText">#FFB8D4C3</Color>
+
+  <Color x:Key="C.Accent">#FF2AE39C</Color>
+  <Color x:Key="C.Accent2">#FF46A3FF</Color>
+
+  <SolidColorBrush x:Key="App.Background" Color="{StaticResource C.Bg}"/>
+  <SolidColorBrush x:Key="App.Surface" Color="{StaticResource C.Surface}"/>
+  <SolidColorBrush x:Key="App.Surface2" Color="{StaticResource C.Surface2}"/>
+  <SolidColorBrush x:Key="App.Text" Color="{StaticResource C.Text}"/>
+  <SolidColorBrush x:Key="App.SubtleText" Color="{StaticResource C.SubtleText}"/>
+  <SolidColorBrush x:Key="App.Border" Color="{StaticResource C.Border}"/>
+
+  <SolidColorBrush x:Key="App.Accent" Color="{StaticResource C.Accent}"/>
+  <SolidColorBrush x:Key="App.Accent2" Color="{StaticResource C.Accent2}"/>
+  <SolidColorBrush x:Key="App.Success" Color="#FF2AE39C"/>
+  <SolidColorBrush x:Key="App.Warning" Color="#FFF7B731"/>
+  <SolidColorBrush x:Key="App.Error" Color="#FFFF5E57"/>
+
+</ResourceDictionary>

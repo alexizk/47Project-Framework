@@ -1,0 +1,13 @@
+{
+  "schemaVersion": "1.0.0",
+  "allowUnsafe": true,
+  "unsafeGates": {
+    "unsafe_requires_admin": true,
+    "unsafe_requires_explicit_policy": true,
+    "blocked": false
+  },
+  "capabilityGrants": {},
+  "ui": {
+    "theme": "matrix"
+  }
+}
