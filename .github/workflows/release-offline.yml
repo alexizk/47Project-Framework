@@ -22,7 +22,7 @@ jobs:
           pwsh -NoLogo -NoProfile -File tools/build_offline_release.ps1
 
       - name: Upload dist artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: offline-release
           path: dist/*.zip
