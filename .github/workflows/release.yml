@@ -45,7 +45,7 @@ jobs:
         run: pwsh -NoLogo -NoProfile -File tools/release_notes.ps1 -Tag ${{ github.ref_name }} -OutPath dist/release_notes.md
 
       - name: Upload dist artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: dist
           path: dist
