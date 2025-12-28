@@ -1,0 +1,13 @@
+47Project Framework - License
+
+This repository/package is provided for internal use and evaluation.
+
+Unless you have a written agreement granting additional rights, you may not:
+- redistribute this package publicly,
+- sell or sublicense it,
+- remove attribution, or
+- use it to create a competing distribution.
+
+Copyright (c) 2025 Project47
+
+If you want this released under MIT/Apache-2.0/GPL or another license, replace this file accordingly.

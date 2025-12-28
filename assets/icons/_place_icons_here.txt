@@ -1,0 +1,2 @@
+Place app icons here. Name them to match script base name, e.g. 47Project.Framework.png
+Supported: png/jpg/ico

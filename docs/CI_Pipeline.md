@@ -16,3 +16,8 @@ Recommended minimal CI steps:
    - Optionally sign plans/bundles and publish signatures.
 
 See `.github/workflows/ci.yml`.
+
+## Test dependencies
+CI should ensure:
+- PowerShell 7+
+- Pester 5+ (use `tools/install_pester.ps1`)

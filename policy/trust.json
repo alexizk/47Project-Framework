@@ -1,0 +1,8 @@
+{
+  "requireSignedModules": false,
+  "requireSignedBundles": false,
+  "allowedThumbprints": [],
+  "allowUnsignedInDev": true,
+  "allowedModuleFingerprints": [],
+  "allowedBundleHashes": []
+}

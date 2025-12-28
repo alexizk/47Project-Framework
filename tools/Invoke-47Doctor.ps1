@@ -1,5 +1,12 @@
 # Invoke-47Doctor.ps1
 # Basic environment self-test for 47Project Framework.
+
+[CmdletBinding()]
+param(
+  [switch]$Fix,
+  [string]$OutPath = ''
+)
+
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
@@ -76,9 +83,55 @@ Write-Host "47 Doctor Results"
 Write-Host "-----------------"
 $results | Format-Table -AutoSize
 
+# Fix plan (best-effort)
+$fixes = @()
+function Add-Fix([string]$id,[string]$title,[string]$cmd,[string]$notes) {
+  $script:fixes += [pscustomobject]@{ id=$id; title=$title; command=$cmd; notes=$notes }
+}
+
+try {
+  if ($IsLinux -or $IsMacOS) {
+    $inst = Join-Path $here 'install_dependencies.sh'
+    if (Test-Path -LiteralPath $inst) {
+      Add-Fix 'deps' 'Install dependencies (pwsh/docker)' ("bash " + $inst) 'Runs the helper installer.'
+    }
+  }
+} catch { }
+
+try {
+  Add-Fix 'pester' 'Cache Pester into tools/.vendor' 'pwsh -File tools/install_pester.ps1' 'Ensures offline test runs.'
+} catch { }
+
+$report = [pscustomobject]@{
+  timestamp = (Get-Date).ToString('o')
+  results = $results
+  fixPlan = $fixes
+}
+
+if ([string]::IsNullOrWhiteSpace($OutPath)) {
+  try {
+    $paths = Get-47Paths
+    $OutPath = Join-Path $paths.LogsRootUser ('doctor_' + (Get-Date -Format 'yyyyMMdd_HHmmss') + '.json')
+  } catch { }
+}
+
+try {
+  ($report | ConvertTo-Json -Depth 8) | Set-Content -LiteralPath $OutPath -Encoding utf8
+  Write-Host ('Doctor report: ' + $OutPath)
+  try { Set-47StateRecord -Name 'last_doctor' -Value $report | Out-Null } catch { }
+} catch { }
+
+if ($Fix) {
+  Write-Host ""
+  Write-Host "Suggested fixes:"
+  foreach ($f in $fixes) { Write-Host ('- ' + $f.title + ': ' + $f.command) }
+  Write-Host "Auto-fix execution is intentionally conservative; run commands above manually."
+}
+
 if ($failed -gt 0) {
   Write-Warning "$failed check(s) failed."
   exit 1
 }
+
 Write-Host "All checks passed."
 exit 0

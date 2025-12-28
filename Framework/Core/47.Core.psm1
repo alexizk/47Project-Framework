@@ -1,4 +1,4 @@
-# 47Project Framework Core
+﻿# 47Project Framework Core
 Set-StrictMode -Version Latest
 
 function Get-47PackRoot {
@@ -64,6 +64,79 @@ function Get-47Paths {
   }
 
   return [pscustomobject]$paths
+}
+
+function Grant-47ModuleCapabilities {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory)][string]$ModuleId,
+    [Parameter(Mandatory)][string[]]$Capabilities
+  )
+  Set-StrictMode -Version Latest
+  $ErrorActionPreference = 'Stop'
+
+  $paths = Get-47Paths
+  $pUser = $paths.PolicyUserPath
+
+  $p = $null
+  try { if (Test-Path -LiteralPath $pUser) { $p = Read-47Json -Path $pUser } } catch { $p = $null }
+  if (-not $p) { $p = [pscustomobject]@{ schemaVersion = 1 } }
+
+  if (-not $p.capabilityGrants) { $p | Add-Member -Force -NotePropertyName capabilityGrants -NotePropertyValue ([pscustomobject]@{ global=@(); modules=@{} }) }
+  if (-not $p.capabilityGrants.modules) { $p.capabilityGrants | Add-Member -Force -NotePropertyName modules -NotePropertyValue (@{}) }
+
+  $existing = @()
+  try { $existing = @($p.capabilityGrants.modules.$ModuleId) } catch { $existing = @() }
+
+  $merged = @($existing + $Capabilities) | Where-Object { -not [string]::IsNullOrWhiteSpace($_) } | Select-Object -Unique
+
+  # PSCustomObject doesn't like dynamic keys sometimes; use Add-Member
+  try {
+    $p.capabilityGrants.modules | Add-Member -Force -NotePropertyName $ModuleId -NotePropertyValue $merged
+  } catch {
+    # fallback: rebuild hashtable
+    $ht = @{}
+    foreach ($pr in $p.capabilityGrants.modules.PSObject.Properties) { $ht[$pr.Name] = $pr.Value }
+    $ht[$ModuleId] = $merged
+    $p.capabilityGrants.modules = [pscustomobject]$ht
+  }
+
+  $dir = Split-Path -Parent $pUser
+  if ($dir -and -not (Test-Path -LiteralPath $dir)) { New-Item -ItemType Directory -Force -Path $dir | Out-Null }
+  ($p | ConvertTo-Json -Depth 12) | Set-Content -LiteralPath $pUser -Encoding utf8
+
+  Write-47Log -Level INFO -Component 'Policy' -Message ('Granted capabilities to ' + $ModuleId) -Data @{ moduleId=$ModuleId; capabilities=$merged }
+  return $merged
+}
+
+function Set-47StateRecord {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory)][string]$Name,
+    [Parameter(Mandatory)][object]$Value
+  )
+  Set-StrictMode -Version Latest
+  $ErrorActionPreference = 'Stop'
+
+  $paths = Get-47Paths
+  $stateDir = Join-Path $paths.LogsRootUser 'state'
+  if (-not (Test-Path -LiteralPath $stateDir)) { New-Item -ItemType Directory -Force -Path $stateDir | Out-Null }
+
+  $outPath = Join-Path $stateDir ($Name + '.json')
+  ($Value | ConvertTo-Json -Depth 12) | Set-Content -LiteralPath $outPath -Encoding utf8
+  return $outPath
+}
+
+function Get-47StateRecord {
+  [CmdletBinding()]
+  param([Parameter(Mandatory)][string]$Name)
+  Set-StrictMode -Version Latest
+  $ErrorActionPreference = 'Stop'
+
+  $paths = Get-47Paths
+  $p = Join-Path (Join-Path $paths.LogsRootUser 'state') ($Name + '.json')
+  if (-not (Test-Path -LiteralPath $p)) { return $null }
+  return (Get-Content -Raw -LiteralPath $p | ConvertFrom-Json)
 }
 
 function Write-47Log {
@@ -231,7 +304,18 @@ function Get-47EffectivePolicy {
       global = @()
       modules = @{}
     }
-    ui = @{
+    
+    externalRuntimes = @{
+      allow = $true
+      allowPython = $true
+      allowNode = $true
+      allowGo = $true
+      allowExe = $false
+      allowPwshScript = $true
+    }
+    requireVerifiedRelease = $false
+    safeMode = $false
+ui = @{
       warnOnUnsafe = $true
       showAdvancedByDefault = $false
     }
@@ -381,6 +465,205 @@ function Expand-47ZipSafe {
   }
 }
 
+function Resolve-47Runtime {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory)][string]$Name
+  )
+  $candidates = @()
+  switch ($Name.ToLowerInvariant()) {
+    'python' { $candidates = @('python','python3','py') }
+    'node'   { $candidates = @('node') }
+    'go'     { $candidates = @('go') }
+    'pwsh'   { $candidates = @('pwsh') }
+    default  { $candidates = @($Name) }
+  }
+
+  foreach ($c in $candidates) {
+    try {
+      $cmd = Get-Command $c -ErrorAction Stop
+      if ($cmd -and $cmd.Source) { return $cmd.Source }
+    } catch { }
+  }
+
+  return $null
+}
+
+function Read-47ModuleManifest {
+  [CmdletBinding()]
+  param([Parameter(Mandatory)][string]$ModulePath)
+
+  $manifestPath = Join-Path $ModulePath 'module.json'
+  if (-not (Test-Path -LiteralPath $manifestPath)) { throw "Module manifest not found: $manifestPath" }
+  return (Read-47Json -Path $manifestPath)
+}
+
+function Get-47ModuleRunSpec {
+  [CmdletBinding()]
+  param([Parameter(Mandatory)][object]$Manifest)
+
+  # Preferred schema: manifest.run
+  try {
+    if ($Manifest.run) { return $Manifest.run }
+  } catch { }
+
+  return $null
+}
+
+
+  # Risk-based safety: if module marked unsafe, force capture mode (to always produce logs) and avoid Start-Process.
+  $risk = 'unknown'
+  try { $risk = [string]$mod.risk } catch { }
+  if ($risk -and $risk.ToLowerInvariant() -eq 'unsafe') {
+    if ($Mode -eq 'Launch') { $Mode = 'Capture' }
+  }
+
+  $sw = [System.Diagnostics.Stopwatch]::StartNew()
+  $last = $null
+function Invoke-47ModuleRun {
+  <#
+  .SYNOPSIS
+    Runs a module via its module.json run spec (supports PowerShell + external runtimes).
+  .PARAMETER ModulePath
+    Module directory containing module.json.
+  .PARAMETER Mode
+    'Launch' uses Start-Process (no capture). 'Capture' runs and captures stdout/stderr.
+  .PARAMETER ExtraArgs
+    Extra CLI args appended after module run args.
+  #>
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory)][string]$ModulePath,
+    [ValidateSet('Launch','Capture')][string]$Mode = 'Launch',
+    [string[]]$ExtraArgs = @()
+  )
+
+  $m = Read-47ModuleManifest -ModulePath $ModulePath
+
+  # Back-compat: PowerShell module with entrypoint
+  $run = Get-47ModuleRunSpec -Manifest $m
+  if (-not $run) {
+    # default: import module entrypoint if present
+    if ($m.entrypoint) {
+      (Import-47Module -ModulePath $ModulePath)
+    }
+    throw "Module has no run spec and no entrypoint."
+  }
+
+  $type = [string]$run.type
+  if ([string]::IsNullOrWhiteSpace($type)) { throw "run.type missing in module.json" }
+
+  $cwd = $null
+  try { $cwd = [string]$run.cwd } catch { }
+  if ([string]::IsNullOrWhiteSpace($cwd)) { $cwd = $ModulePath } else { $cwd = Join-Path $ModulePath $cwd }
+
+  $env = @{}
+  try {
+    if ($run.env) {
+      foreach ($p in $run.env.PSObject.Properties) { $env[$p.Name] = [string]$p.Value }
+    }
+  } catch { }
+
+  $args = @()
+  try {
+    if ($run.args) { foreach ($a in $run.args) { $args += [string]$a } }
+  } catch { }
+  if ($ExtraArgs) { $args += $ExtraArgs }
+
+  $entry = $null
+  $expectedSha256 = ''
+  try { $expectedSha256 = [string]$run.expectedSha256 } catch { }
+
+  try { $entry = [string]$run.entry } catch { }
+
+  $last = (switch ($type.ToLowerInvariant()) {
+
+    'pwsh-module' {
+      (Import-47Module -ModulePath $ModulePath)
+    }
+
+    'pwsh-script' {
+      if (-not $entry) { throw "run.entry required for pwsh-script" }
+      $scriptPath = Join-Path $ModulePath $entry
+      if (-not (Test-Path -LiteralPath $scriptPath)) { throw "Script not found: $scriptPath" }
+      $pw = Resolve-47Runtime -Name 'pwsh'
+      if (-not $pw) { throw "pwsh not found" }
+      $al = @('-NoLogo','-NoProfile','-File', $scriptPath) + $args
+      if ($Mode -eq 'Launch') { Start-Process -FilePath $pw -ArgumentList $al -WorkingDirectory $cwd | Out-Null; $true }
+      $out = Join-Path $cwd '_stdout.txt'
+      $err = Join-Path $cwd '_stderr.txt'
+      (Invoke-47External -FilePath $pw -ArgumentList $al -WorkingDirectory $cwd -Environment $env -StdOutFile $out -StdErrFile $err)
+    }
+
+    'python' {
+      if (-not $entry) { throw "run.entry required for python" }
+      $py = Resolve-47Runtime -Name 'python'
+      if (-not $py) { throw "python not found (install Python 3 or set PATH)" }
+      $scriptPath = Join-Path $ModulePath $entry
+      if (-not (Test-Path -LiteralPath $scriptPath)) { throw "Python entry not found: $scriptPath" }
+      $al = @($scriptPath) + $args
+      if ($Mode -eq 'Launch') { Start-Process -FilePath $py -ArgumentList $al -WorkingDirectory $cwd | Out-Null; $true }
+      $out = Join-Path $cwd '_stdout.txt'
+      $err = Join-Path $cwd '_stderr.txt'
+      (Invoke-47External -FilePath $py -ArgumentList $al -WorkingDirectory $cwd -Environment $env -StdOutFile $out -StdErrFile $err)
+    }
+
+    'node' {
+      if (-not $entry) { throw "run.entry required for node" }
+      $node = Resolve-47Runtime -Name 'node'
+      if (-not $node) { throw "node not found (install Node.js)" }
+      $scriptPath = Join-Path $ModulePath $entry
+      if (-not (Test-Path -LiteralPath $scriptPath)) { throw "Node entry not found: $scriptPath" }
+      $al = @($scriptPath) + $args
+      if ($Mode -eq 'Launch') { Start-Process -FilePath $node -ArgumentList $al -WorkingDirectory $cwd | Out-Null; $true }
+      $out = Join-Path $cwd '_stdout.txt'
+      $err = Join-Path $cwd '_stderr.txt'
+      (Invoke-47External -FilePath $node -ArgumentList $al -WorkingDirectory $cwd -Environment $env -StdOutFile $out -StdErrFile $err)
+    }
+
+    'go' {
+      if (-not $entry) { throw "run.entry required for go" }
+      $go = Resolve-47Runtime -Name 'go'
+      if (-not $go) { throw "go not found (install Go toolchain)" }
+      $target = Join-Path $ModulePath $entry
+      if (-not (Test-Path -LiteralPath $target)) { throw "Go entry not found: $target" }
+      # Default behavior: go run <entry> -- <args>
+      $al = @('run', $target)
+      if ($args.Count -gt 0) { $al += @('--') + $args }
+      if ($Mode -eq 'Launch') { Start-Process -FilePath $go -ArgumentList $al -WorkingDirectory $cwd | Out-Null; $true }
+      $out = Join-Path $cwd '_stdout.txt'
+      $err = Join-Path $cwd '_stderr.txt'
+      (Invoke-47External -FilePath $go -ArgumentList $al -WorkingDirectory $cwd -Environment $env -StdOutFile $out -StdErrFile $err)
+    }
+
+    'exe' {
+      if (-not $entry) { throw "run.entry required for exe" }
+      $exe = Join-Path $ModulePath $entry
+      if (-not (Test-Path -LiteralPath $exe)) { throw "Executable not found: $exe" }
+      if ($Mode -eq 'Launch') { Start-Process -FilePath $exe -ArgumentList $args -WorkingDirectory $cwd | Out-Null; $true }
+      $out = Join-Path $cwd '_stdout.txt'
+      $err = Join-Path $cwd '_stderr.txt'
+      (Invoke-47ExternalTool -RuntimeType 'exe' -FilePath $exe -ArgumentList $args -WorkingDirectory $cwd -Environment $env -StdOutFile $out -StdErrFile $err -ExpectedSha256 $expectedSha256 -Policy $ctx.Policy)
+    }
+
+    default {
+      throw ("Unsupported run.type: " + $type)
+    }
+  })
+
+  $sw.Stop()
+  try {
+    if ($last -is [pscustomobject]) {
+      Write-47RunHistory -Kind 'module' -Id ([System.IO.Path]::GetFileName($ModulePath)) -Context $ctx -Ok ([bool]$last.ok) -ExitCode ([int]$last.exitCode) -DurationMs ([int]$last.durationMs) -StdOutPath ([string]$last.stdoutPath) -StdErrPath ([string]$last.stderrPath)
+    } else {
+      Write-47RunHistory -Kind 'module' -Id ([System.IO.Path]::GetFileName($ModulePath)) -Context $ctx -Ok $true -ExitCode 0 -DurationMs ([int]$sw.ElapsedMilliseconds
+      )
+    }
+  } catch { }
+  return $last
+}
+
+
 function Invoke-47External {
   [CmdletBinding()]
   param(
@@ -400,7 +683,22 @@ function Invoke-47External {
 
   if (-not (Test-Path -LiteralPath $FilePath)) { throw "External not found: $FilePath" }
 
-  # Ensure parent directories exist for streaming outputs
+  
+  # Ensure StdOutFile/StdErrFile exist even when the process produces no output
+  try {
+    if ($StdOutFile) {
+      $d = Split-Path -Parent $StdOutFile
+      if ($d -and -not (Test-Path -LiteralPath $d)) { New-Item -ItemType Directory -Force -Path $d | Out-Null }
+      # create empty file if missing
+      if (-not (Test-Path -LiteralPath $StdOutFile)) { '' | Set-Content -LiteralPath $StdOutFile -Encoding UTF8 }
+    }
+    if ($StdErrFile) {
+      $d2 = Split-Path -Parent $StdErrFile
+      if ($d2 -and -not (Test-Path -LiteralPath $d2)) { New-Item -ItemType Directory -Force -Path $d2 | Out-Null }
+      if (-not (Test-Path -LiteralPath $StdErrFile)) { '' | Set-Content -LiteralPath $StdErrFile -Encoding UTF8 }
+    }
+  } catch { }
+# Ensure parent directories exist for streaming outputs
   if ($StdOutFile) {
     $pdir = Split-Path -Parent $StdOutFile
     if ($pdir) { New-Item -ItemType Directory -Force -Path $pdir | Out-Null }
@@ -500,6 +798,131 @@ function Invoke-47External {
     StdOut   = $sbOut.ToString()
     StdErr   = $sbErr.ToString()
   }
+}
+
+function Invoke-47ExternalTool {
+  <#
+  .SYNOPSIS
+    Runs an external tool in a policy-aware way (allowlist + optional hash pinning) and returns a standardized result.
+  .PARAMETER RuntimeType
+    One of: python, node, go, exe, pwsh-script
+  .PARAMETER FilePath
+    Executable path.
+  .PARAMETER ArgumentList
+    Arguments array.
+  .PARAMETER WorkingDirectory
+    Working folder.
+  .PARAMETER StdOutFile
+    Optional capture file.
+  .PARAMETER StdErrFile
+    Optional capture file.
+  .PARAMETER ExpectedSha256
+    Optional SHA256 pin for the executable (lower/upper accepted).
+  #>
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory)][string]$RuntimeType,
+    [Parameter(Mandatory)][string]$FilePath,
+    [string[]]$ArgumentList = @(),
+    [string]$WorkingDirectory,
+    [hashtable]$Environment = @{},
+    [string]$StdOutFile,
+    [string]$StdErrFile,
+    [int]$TimeoutSeconds = 300,
+    [string]$ExpectedSha256 = '',
+    [object]$Policy
+  )
+
+  if (-not $Policy) { $Policy = Get-47EffectivePolicy }
+  if (-not (Test-47ExternalRuntimeAllowed -RuntimeType $RuntimeType -Policy $Policy)) {
+    throw "PolicyDenied: external runtime '$RuntimeType' is not allowed by policy."
+  }
+
+  if (-not [string]::IsNullOrWhiteSpace($ExpectedSha256)) {
+    $h = (Get-FileHash -Algorithm SHA256 -LiteralPath $FilePath).Hash.ToLowerInvariant()
+    if ($h -ne $ExpectedSha256.ToLowerInvariant()) {
+      throw "IntegrityError: SHA256 mismatch for '$FilePath'. Expected $ExpectedSha256, got $h."
+    }
+  }
+
+  $sw = [System.Diagnostics.Stopwatch]::StartNew()
+  $r = Invoke-47External -FilePath $FilePath -ArgumentList $ArgumentList -WorkingDirectory $WorkingDirectory -Environment $Environment -TimeoutSeconds $TimeoutSeconds -StdOutFile $StdOutFile -StdErrFile $StdErrFile
+  $sw.Stop()
+
+  # Standardize
+  return [pscustomobject]@{
+    ok = [bool]$r.ok
+    exitCode = [int]$r.exitCode
+    durationMs = [int]$sw.ElapsedMilliseconds
+    stdoutPath = $StdOutFile
+    stderrPath = $StdErrFile
+    filePath = $FilePath
+    runtimeType = $RuntimeType
+  }
+}
+
+function Write-47RunHistory {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory)][string]$Kind,   # module|plan|tool
+    [Parameter(Mandatory)][string]$Id,
+    [Parameter(Mandatory)][hashtable]$Context,
+    [Parameter(Mandatory)][bool]$Ok,
+    [int]$ExitCode = 0,
+    [int]$DurationMs = 0,
+    [string]$StdOutPath = '',
+    [string]$StdErrPath = '',
+    [string]$ExtraJson = ''
+  )
+
+  try {
+    $paths = Get-47Paths
+    $p = Join-Path $paths.LogsRootUser 'history.jsonl'
+    $rec = [pscustomobject]@{
+      timestamp = (Get-Date).ToString('o')
+      kind = $Kind
+      id = $Id
+      ok = $Ok
+      exitCode = $ExitCode
+      durationMs = $DurationMs
+      stdoutPath = $StdOutPath
+      stderrPath = $StdErrPath
+      host = [pscustomobject]@{
+        os = $Context.OS
+        pwsh = $Context.PwshVersion
+      }
+    }
+    if ($ExtraJson) {
+      try { $rec | Add-Member -Force -NotePropertyName extra -NotePropertyValue ($ExtraJson | ConvertFrom-Json) } catch { }
+    }
+    ($rec | ConvertTo-Json -Depth 10 -Compress) + "`n" | Add-Content -LiteralPath $p -Encoding utf8
+  } catch { }
+}
+
+function Invoke-47SandboxPwsh {
+  <#
+  .SYNOPSIS
+    Runs a PowerShell script in a separate pwsh process with conservative flags, captures output, and returns a result.
+  .DESCRIPTION
+    This is a lightweight sandbox (no profile, noninteractive, controlled working dir). On Windows it can be extended later.
+  #>
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory)][string]$ScriptPath,
+    [string[]]$Arguments = @(),
+    [Parameter(Mandatory)][string]$WorkingDirectory,
+    [hashtable]$Environment = @{},
+    [string]$StdOutFile,
+    [string]$StdErrFile,
+    [int]$TimeoutSeconds = 300,
+    [object]$Policy
+  )
+  if (-not $Policy) { $Policy = Get-47EffectivePolicy }
+  $pw = Resolve-47Runtime -Name 'pwsh'
+  if (-not $pw) { throw "pwsh not found" }
+
+  $al = @('-NoLogo','-NoProfile','-NonInteractive','-ExecutionPolicy','Bypass','-File',$ScriptPath) + $Arguments
+  return (Invoke-47ExternalTool -RuntimeType 'pwsh-script' -FilePath $pw -ArgumentList $al -WorkingDirectory $WorkingDirectory -Environment $Environment -StdOutFile $StdOutFile -StdErrFile $StdErrFile -TimeoutSeconds $TimeoutSeconds -Policy $Policy)
 }
 
 
@@ -934,6 +1357,98 @@ function Get-47Context {
   }
 }
 
+
+  # Policy: external runtimes
+  if ($type) {
+    $tlow = $type.ToLowerInvariant()
+    if (@('python','node','go','exe','pwsh-script') -contains $tlow) {
+      Assert-47ExternalRuntimeAllowed -Context $ctx -RuntimeType $tlow -Reason ('Module: ' + [string]$m.moduleId)
+    }
+  }
+
+
+  $ctx = Get-47Context
+  Assert-47ReleaseVerified -Policy $ctx.Policy
+
+  Write-47Log -Level INFO -Component 'ModuleRun' -Message ('Start: ' + [string]$m.moduleId) -Data @{ moduleId=$m.moduleId; mode=$Mode; runType=$type }
+
+  # Policy: risk and capabilities (from module.json)
+  try {
+    $mrisk = $null
+    try { $mrisk = [string]$m.risk } catch { $mrisk = $null }
+    if (-not [string]::IsNullOrWhiteSpace($mrisk)) {
+      Assert-47Policy -Context $ctx -Risk $mrisk -Reason ("Module: " + [string]$m.moduleId)
+    }
+
+    $caps = @()
+    try { $caps = @($m.capabilities) } catch { $caps = @() }
+    foreach ($c in $caps) {
+      if (-not [string]::IsNullOrWhiteSpace([string]$c)) {
+        Assert-47Policy -Context $ctx -Capability ([string]$c) -Reason ("Module: " + [string]$m.moduleId)
+      }
+    }
+  } catch { throw }
+
+
+function Test-47ReleaseVerified {
+  [CmdletBinding()]
+  param([object]$Policy)
+
+  if (-not $Policy) { $Policy = Get-47EffectivePolicy }
+  try { if (-not [bool]$Policy.requireVerifiedRelease) { return $true } } catch { return $true }
+
+  try {
+    $lv = Get-47StateRecord -Name 'last_verify'
+    if ($lv -and $lv.ok -eq $true) { return $true }
+  } catch { }
+  return $false
+}
+
+function Assert-47ReleaseVerified {
+  [CmdletBinding()]
+  param([object]$Policy)
+  if (-not (Test-47ReleaseVerified -Policy $Policy)) {
+    throw "PolicyDenied: release is not verified. Run Verify Release first (GUI Settings or tools/release_verify_offline.ps1)."
+  }
+}
+
+function Test-47ExternalRuntimeAllowed {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory)][string]$RuntimeType,
+    [object]$Policy
+  )
+  if (-not $Policy) { $Policy = Get-47EffectivePolicy }
+
+  $rt = $RuntimeType.ToLowerInvariant()
+  $p = $null
+  try { $p = $Policy.externalRuntimes } catch { $p = $null }
+  if (-not $p) { return $true }
+
+  try { if ($p.allow -eq $false) { return $false } } catch { }
+
+  switch ($rt) {
+    'python' { try { return [bool]$p.allowPython } catch { return $true } }
+    'node' { try { return [bool]$p.allowNode } catch { return $true } }
+    'go' { try { return [bool]$p.allowGo } catch { return $true } }
+    'exe' { try { return [bool]$p.allowExe } catch { return $false } }
+    'pwsh-script' { try { return [bool]$p.allowPwshScript } catch { return $true } }
+    default { return $true }
+  }
+}
+
+function Assert-47ExternalRuntimeAllowed {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory)][hashtable]$Context,
+    [Parameter(Mandatory)][string]$RuntimeType,
+    [Parameter()][string]$Reason = ''
+  )
+  if (-not (Test-47ExternalRuntimeAllowed -RuntimeType $RuntimeType -Policy $Context.Policy)) {
+    throw ("PolicyDenied: external runtime '" + $RuntimeType + "'. " + $Reason)
+  }
+}
+
 function Assert-47Policy {
   [CmdletBinding()]
   param(
@@ -981,3 +1496,22 @@ function Write-47Telemetry {
   }
   ($entry | ConvertTo-Json -Depth 20 -Compress) | Add-Content -LiteralPath $file -Encoding UTF8
 }
+
+  # Safe Mode overlay (env or policy)
+  $safe = $false
+  try { if ($env:P47_SAFE_MODE -eq '1') { $safe = $true } } catch { }
+  try { if ([bool]$policy.safeMode) { $safe = $true } } catch { }
+
+  if ($safe) {
+    $policy.safeMode = $true
+    # tighten external runtimes (deny python/node/go/exe; allow pwsh-script)
+    if (-not $policy.externalRuntimes) { $policy | Add-Member -Force -NotePropertyName externalRuntimes -NotePropertyValue ([pscustomobject]@{}) }
+    $policy.externalRuntimes.allowPython = $false
+    $policy.externalRuntimes.allowNode = $false
+    $policy.externalRuntimes.allowGo = $false
+    $policy.externalRuntimes.allowExe = $false
+    $policy.externalRuntimes.allowPwshScript = $true
+    # require explicit unsafe policy to run unsafe
+    $policy.allowUnsafe = $false
+    try { $policy.ui.warnOnUnsafe = $true } catch { }
+  }

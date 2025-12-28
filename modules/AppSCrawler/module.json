@@ -212,11 +212,5 @@
     "publisherThumbprintsAllowlist": [
       "<YOUR_CERT_THUMBPRINT>"
     ]
-  },
-  "entrypoint": "module.psm1",
-  "apiLevel": 1,
-  "supportedPlatforms": [
-    "win32"
-  ],
-  "minPowerShellVersion": "7.2"
+  }
 }

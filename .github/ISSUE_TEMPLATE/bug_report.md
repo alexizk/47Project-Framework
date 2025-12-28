@@ -1,24 +1,20 @@
 ---
 name: Bug report
-about: Report a problem or regression
+about: Report a problem in 47Project Framework
+title: "[Bug] "
+labels: bug
 ---
 
-## Describe the bug
-A clear description of what went wrong.
+## What happened
+-
 
 ## Steps to reproduce
 1.
 2.
-3.
 
 ## Expected behavior
-
-## Actual behavior
-
-## Logs / support bundle
-Attach relevant logs or a support bundle (redact secrets).
+-
 
 ## Environment
 - OS:
-- PowerShell:
-- Framework version:
+- PowerShell: `pwsh --version`

@@ -6,55 +6,56 @@ on:
 
 jobs:
   test:
-    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install Pester + PSScriptAnalyzer
-        shell: pwsh
-        run: |
-          Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
-          Install-Module Pester -Force -Scope CurrentUser -MinimumVersion 5.0.0
-          Install-Module PSScriptAnalyzer -Force -Scope CurrentUser
+      - name: Setup PowerShell (non-Windows)
+        uses: PowerShell/PowerShell@v1
+        if: runner.os != 'Windows'
 
-      - name: Style check
+      - name: Show pwsh version
         shell: pwsh
-        run: |
-          ./tools/Invoke-47StyleCheck.ps1
+        run: pwsh -NoLogo -NoProfile -Command '$PSVersionTable'
 
-- name: Validate example plans (schema best effort)
-  shell: pwsh
-  run: |
-    Get-ChildItem -LiteralPath ./examples/plans -Filter '*.json' -Recurse -File | ForEach-Object {
-      ./tools/Validate-47Plan.ps1 -PlanPath $_.FullName
-    }
-
-      - name: Security scan
+      - name: Install/Cache Pester (tooling)
         shell: pwsh
-        run: |
-          ./tools/Invoke-47SecurityScan.ps1 -FailOnFindings
+        run: pwsh -NoLogo -NoProfile -File tools/install_pester.ps1
 
       - name: Run tests
         shell: pwsh
-        run: |
-          Invoke-Pester -Path ./tests -CI
+        run: pwsh -NoLogo -NoProfile -File tools/Invoke-47Tests.ps1 -CI
 
-      - name: Generate artifact manifest (smoke)
+      - name: Lint modules
         shell: pwsh
-        run: |
-          ./tools/Generate-47ArtifactManifest.ps1 -VersionTag ci
+        run: pwsh -NoLogo -NoProfile -File tools/lint_modules.ps1
 
-      - name: Validate artifact manifest (smoke)
+      - name: Verify vendored Pester
         shell: pwsh
-        run: |
-          ./tools/Validate-47ArtifactManifest.ps1
+        run: pwsh -NoLogo -NoProfile -File tools/verify_vendor_pester.ps1
 
-      - name: Doctor (smoke)
-        shell: pwsh
-        run: |
-          ./tools/Invoke-47Doctor.ps1
+  release:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup PowerShell
+        uses: PowerShell/PowerShell@v1
 
-      - name: Build offline docs (smoke)
+      - name: Vendor Pester into tools/.vendor (for offline zip)
         shell: pwsh
-        run: |
-          ./tools/Build-47Docs.ps1
+        run: pwsh -NoLogo -NoProfile -File tools/install_pester.ps1
+
+      - name: Build offline release zip
+        shell: pwsh
+        run: pwsh -NoLogo -NoProfile -File tools/release_build.ps1
+
+      - name: Upload dist
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist

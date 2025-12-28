@@ -1,0 +1,61 @@
+name: Release
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Vendor/cache Pester into tools/.vendor
+        shell: pwsh
+        run: pwsh -NoLogo -NoProfile -File tools/install_pester.ps1
+
+      - name: Verify vendored Pester
+        shell: pwsh
+        run: pwsh -NoLogo -NoProfile -File tools/verify_vendor_pester.ps1
+
+      - name: Run tests
+        shell: pwsh
+        run: pwsh -NoLogo -NoProfile -File tools/Invoke-47Tests.ps1 -CI
+
+      - name: Build offline release zip
+        shell: pwsh
+        env:
+          RELEASE_SIGNING_KEY_XML: ${{ secrets.RELEASE_SIGNING_KEY_XML }}
+        run: |
+          if ($env:RELEASE_SIGNING_KEY_XML) {
+            New-Item -ItemType Directory -Force -Path keys | Out-Null
+            $keyPath = Join-Path (Get-Location) 'keys/release_private.xml'
+            Set-Content -LiteralPath $keyPath -Value $env:RELEASE_SIGNING_KEY_XML -Encoding utf8
+            pwsh -NoLogo -NoProfile -File tools/release_build.ps1 -SignKeyPath $keyPath
+          } else {
+            pwsh -NoLogo -NoProfile -File tools/release_build.ps1
+          }
+
+      - name: Generate release notes
+        shell: pwsh
+        run: pwsh -NoLogo -NoProfile -File tools/release_notes.ps1 -Tag ${{ github.ref_name }} -OutPath dist/release_notes.md
+
+      - name: Upload dist artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          body_path: dist/release_notes.md
+          files: |
+            dist/*.zip
+            dist/manifest.json
+            dist/SHA256SUMS.txt
+            dist/*.sig

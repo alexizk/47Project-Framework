@@ -1,40 +1,4 @@
 # Code of Conduct
 
-This project follows the **Contributor Covenant Code of Conduct v2.1**.
-
-## Our pledge
-We as members, contributors, and leaders pledge to make participation in our community a harassment-free experience for everyone.
-
-## Our standards
-Examples of behavior that contributes to a positive environment include:
-- Demonstrating empathy and kindness toward other people
-- Being respectful of differing opinions, viewpoints, and experiences
-- Giving and gracefully accepting constructive feedback
-- Accepting responsibility and apologizing to those affected by our mistakes
-
-Examples of unacceptable behavior include:
-- The use of sexualized language or imagery, and sexual attention or advances
-- Trolling, insulting or derogatory comments, and personal or political attacks
-- Public or private harassment
-- Publishing others' private information without explicit permission
-- Other conduct which could reasonably be considered inappropriate in a professional setting
-
-## Enforcement responsibilities
-Community leaders are responsible for clarifying and enforcing our standards of acceptable behavior.
-
-## Scope
-This Code of Conduct applies within all community spaces and also applies when an individual is officially representing the community.
-
-## Enforcement
-Instances of abusive, harassing, or otherwise unacceptable behavior may be reported to the maintainers listed in **MAINTAINERS.md**.
-All complaints will be reviewed and investigated promptly and fairly.
-
-## Enforcement guidelines
-Community leaders will follow these Community Impact Guidelines:
-1. Correction
-2. Warning
-3. Temporary ban
-4. Permanent ban
-
-## Attribution
-This Code of Conduct is adapted from the Contributor Covenant, version 2.1.
+Be respectful. No harassment, hate speech, or doxxing.
+Assume good intent, but prioritize safety and clarity.

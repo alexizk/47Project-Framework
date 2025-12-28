@@ -1,0 +1,12 @@
+# build/output
+dist/
+data/
+*.zip
+*.log
+
+# OS/editor
+.DS_Store
+Thumbs.db
+
+# PowerShell
+*.ps1xml.user

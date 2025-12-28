@@ -1,0 +1,28 @@
+name: Build Offline Release
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Show PowerShell
+        shell: pwsh
+        run: pwsh --version
+
+      - name: Vendor dependencies
+        shell: pwsh
+        run: |
+          pwsh -NoLogo -NoProfile -File tools/vendor_everything.ps1 -Force
+
+      - name: Build offline zip
+        shell: pwsh
+        run: |
+          pwsh -NoLogo -NoProfile -File tools/build_offline_release.ps1
+
+      - name: Upload dist artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: offline-release
+          path: dist/*.zip

@@ -1,10 +1,10 @@
-## Summary
-What does this PR change?
+## What changed
+-
+
+## Why
+-
 
 ## Checklist
-- [ ] Tests updated/added
-- [ ] Docs updated (if behavior changes)
-- [ ] Schemas updated (if format changes)
-- [ ] RFC added (if this changes schema/plan runner/trust/policy/public CLI)
-
-## Notes for reviewers
+- [ ] Updated docs (docs/…)
+- [ ] Updated changelog (docs/CHANGELOG.md)
+- [ ] Ran basic smoke test (GUI/CLI)

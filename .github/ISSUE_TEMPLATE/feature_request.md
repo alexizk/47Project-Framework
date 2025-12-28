@@ -1,15 +1,15 @@
 ---
 name: Feature request
-about: Suggest an idea or improvement
+about: Suggest an improvement
+title: "[Feature] "
+labels: enhancement
 ---
 
-## Summary
-What do you want to add/change?
+## Problem
+-
 
-## Motivation
-Why is this useful?
+## Proposal
+-
 
-## Proposed design (optional)
-If it changes schemas/CLI/trust/policy, consider adding an RFC in `docs/rfc/`.
-
-## Alternatives
+## Notes
+-
