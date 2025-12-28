@@ -12,7 +12,7 @@ jobs:
         os: [windows-latest, ubuntu-latest, macos-latest]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Setup PowerShell (non-Windows)
         uses: PowerShell/PowerShell@v1
@@ -42,7 +42,7 @@ jobs:
     needs: test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Setup PowerShell
         uses: PowerShell/PowerShell@v1
 
