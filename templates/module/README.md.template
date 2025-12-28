@@ -1,9 +1,0 @@
-# {{DisplayName}}
-
-ModuleId: `{{ModuleId}}`
-
-## Commands
-- `hello` — example command
-
-## Notes
-- Fill out `capabilities` in `module.json` and implement policy gates in your commands.

@@ -1,9 +1,0 @@
-{
-  "app.title": "47Project Framework",
-  "cli.help.title": "Commands",
-  "policy.denied": "Policy denied: {0}",
-  "trust.publisher.added": "Trusted publisher added: {0}",
-  "trust.hash.pinned": "Trusted artifact hash pinned: {0}",
-  "plan.run.started": "Plan run started: {0}",
-  "plan.run.completed": "Plan run completed: {0}"
-}
