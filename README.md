@@ -29,7 +29,7 @@ It’s built for Project 47 OS/Framework installs where identity should be consi
 ## Files in this branch
 
 - `47Apps-IdentityKit.ps1` → **stable “latest” filename** (same content as the current versioned file)
-- `47Apps-IdentityKit-v2.4.43-PATCH-FinalPolish.ps1` → versioned build
+- `47Apps-IdentityKit-v0.2.ps1` → versioned build
 - `docs/` → full documentation (usage, security, troubleshooting, IT notes)
 
 > Tip: Keep both files committed. Use the stable one in automations; keep the versioned one for traceability.
