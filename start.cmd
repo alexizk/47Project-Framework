@@ -2,6 +2,7 @@
 setlocal
 set SCRIPT_DIR=%~dp0
 echo [47Project] Starting...
+echo Logs: %SCRIPT_DIR%.runtime\logs
 
 REM Prefer pwsh if available (PowerShell 7+), otherwise fall back to Windows PowerShell.
 where pwsh >nul 2>nul

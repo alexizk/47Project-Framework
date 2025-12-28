@@ -1,5 +1,14 @@
 # Changelog
 
+## v52 (2025-12-28)
+- Fixed PowerShell parser error on Linux/macOS: removed duplicate script param block in Framework/47Project.Framework.ps1 and merged parameters into a single top-level CmdletBinding param block.
+
+
+## v51 (2025-12-28)
+- Added launcher transcript logging to `.runtime/logs/launch_*.log` and global trap to capture silent exits.
+- start.cmd prints logs folder path.
+
+
 ## v50 (2025-12-28)
 - start.cmd now always pauses so the window doesn't disappear, and prints final exit code.
 - start.ps1 now writes a boot transcript to `.runtime/logs/boot_*.log` and passes P47_PWSH_PATH to the launcher for both GUI/CLI.

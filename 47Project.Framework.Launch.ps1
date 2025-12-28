@@ -1,3 +1,20 @@
+# LAUNCH TRANSCRIPT
+try {
+  $here = Split-Path -Parent $PSCommandPath
+  $logDir = Join-Path $here '.runtime\logs'
+  if (-not (Test-Path -LiteralPath $logDir)) { New-Item -ItemType Directory -Force -Path $logDir | Out-Null }
+  $launchLog = Join-Path $logDir ("launch_" + (Get-Date -Format 'yyyyMMdd_HHmmss') + ".log")
+  Start-Transcript -LiteralPath $launchLog -Force | Out-Null
+  Write-Host ("Launch log: " + $launchLog) -ForegroundColor DarkGray
+} catch { }
+
+trap {
+  try { Write-Host ("[Launch] ERROR: " + $_.Exception.Message) -ForegroundColor Red } catch { }
+  try { Write-Host $_.ScriptStackTrace -ForegroundColor DarkGray } catch { }
+  try { Stop-Transcript | Out-Null } catch { }
+  exit 1
+}
+
 ﻿<#
 .SYNOPSIS
   Launches 47Project Framework and ensures PowerShell 7 is available.
@@ -154,3 +171,6 @@ if ($Elevated -and $isWindowsHost) {
 } else {
   Start-Process -FilePath $pwsh -ArgumentList $argList | Out-Null
 }
+
+
+try { Stop-Transcript | Out-Null } catch { }

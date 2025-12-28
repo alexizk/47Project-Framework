@@ -5,7 +5,7 @@ A Windows-first (PowerShell 7+) **Nexus shell** that unifies the Project47 tools
 - CLI shell for non-GUI environments
 - Safe update workflows (stage → diff → apply) + snapshots + policy controls
 
-> Current bundle: **v49** (2025-12-28)
+> Current bundle: **v52** (2025-12-28)
 
 ## Quick start
 
@@ -269,3 +269,5 @@ That typically indicates a Microsoft Store / winget source restriction. The boot
 ## Troubleshooting
 - Bootstrap logs are written to `.runtime/logs/boot_*.log`.
 - `start.cmd` pauses at the end so you can read any errors.
+
+- Launcher transcript logs: `.runtime/logs/launch_*.log`

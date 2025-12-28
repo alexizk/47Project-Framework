@@ -91,8 +91,8 @@
   },
   {
     "path": "47Project.Framework.Launch.ps1",
-    "sha256": "c5ab945105c78dc161c9b529297947b6af0f2a8ef898b12a84b66c8753be95ed",
-    "bytes": 5000
+    "sha256": "0d8606f74aee93eeeac9a1fa2964f17a11e736de0557d8a9bf578ee86efd0fcd",
+    "bytes": 5746
   },
   {
     "path": "47Project.Framework.Ultimate.ps1",
@@ -131,8 +131,8 @@
   },
   {
     "path": "Framework/47Project.Framework.ps1",
-    "sha256": "008c72e3358e07d85574108815335333327a4ef386e848cad8829fcd3ce92991",
-    "bytes": 153426
+    "sha256": "20e974b32d47b21e2f8b5fd6be9cbaefa668b3348ad9f0988cb9cbeea16dd522",
+    "bytes": 125330
   },
   {
     "path": "Framework/Core/47.Core.psd1",
@@ -506,8 +506,8 @@
   },
   {
     "path": "README.md",
-    "sha256": "a5259c8b918d20f0ebb49df7a85b56c6d9943bb71de58769af16b733668f7196",
-    "bytes": 7836
+    "sha256": "5eb17c4aacbebaa8fd9aad488a22f3f477860e0d21ae5a65ac23665826eec6d4",
+    "bytes": 7894
   },
   {
     "path": "Run_47Project_Framework.cmd",
@@ -561,7 +561,7 @@
   },
   {
     "path": "dist_manifest.json",
-    "sha256": "c29ecc9e0046ca63e8a19003182f41b6ea8f2e2ea619141a2b0d3fc170231ff7",
+    "sha256": "9923bb72955513a8e4c48aa1c33495e77ed835eb5c0f8a6575bf249c0617f023",
     "bytes": 68492
   },
   {
@@ -576,8 +576,8 @@
   },
   {
     "path": "docs/CHANGELOG.md",
-    "sha256": "3987f1ab36a74981201c64f19a8752a61120538e4b1b40d05272eeea1c81abb6",
-    "bytes": 6367
+    "sha256": "1923bc7fe5c79b71812e5ae8d732d54d937a78da1d4fc3eb784e4851f9308d67",
+    "bytes": 6752
   },
   {
     "path": "docs/CI_Pipeline.md",
@@ -1671,8 +1671,8 @@
   },
   {
     "path": "start.cmd",
-    "sha256": "a90994fee55811c684f6807ff8b1e44b3a701a1736d4cb5857ba76b522dd8152",
-    "bytes": 589
+    "sha256": "ec4e404c19eeee85f55f86da3e6430f3d705c9692ef9ef002d5867e112d61ec0",
+    "bytes": 626
   },
   {
     "path": "start.ps1",
@@ -2191,7 +2191,7 @@
   },
   {
     "path": "version.json",
-    "sha256": "5b2a3f03c64544de5763d62c72bfe5e160cc9c71cbe42aa6328946a63d5c5d53",
+    "sha256": "4d110c6b1b4f01fd2f5e3612955bc17bc569acf89318a3557be414768187ebf6",
     "bytes": 142
   }
 ]
